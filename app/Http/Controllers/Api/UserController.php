@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
+    /**
+     * Retorna uma lista de usuários.
+     *
+     * Este método recupera uma lista de usuários do banco de dados
+     * e a retorna como uma resposta JSON.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function index():JsonResponse
     {
         // Recupera os usuarios do banco de dados, ordenados por id em ordem decrescente
@@ -27,6 +35,14 @@ class UserController extends Controller
     }
 
 
+     /**
+     * Exibe os detalhes de um usuário específico.
+     *
+     * Este método retorna os detalhes de um usuário específico em formato JSON.
+     *
+     * @param  \App\Models\User  $id O objeto do usuário a ser exibido
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function show(User $id):JsonResponse
     {
         return response()->json([
@@ -34,8 +50,14 @@ class UserController extends Controller
             'user' => $id,
         ],200);
     }
+
     
-    
+    /**
+     * Cria um novo usuário com os dados fornecidos na requisição.
+     * 
+     * @param  \App\Http\Requests\UserRequest  $request O objeto de requisição contendo os dados do usuário a ser criado.
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function store(UserRequest $request) {
         // criar novo usuário
         
@@ -72,6 +94,13 @@ class UserController extends Controller
     }
 
 
+     /**
+     * Atualizar os dados de um usuário existente com base nos dados fornecidos na requisição.
+     * 
+     * @param  \App\Http\Requests\UserRequest  $request O objeto de requisição contendo os dados do usuário a ser atualizado.
+     * @param  \App\Models\User  $id O usuário a ser atualizado.
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function update(UserRequest $request, User $id) : JsonResponse
     {
         // atualizar usuário
@@ -108,6 +137,12 @@ class UserController extends Controller
     }
     
 
+    /**
+     * Excluir o usuário no banco de dados.
+     * 
+     * @param  \App\Models\User  $id O usuário a ser excluído.
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function destroy(User $id) : JsonResponse
     {
         // deletar usuário

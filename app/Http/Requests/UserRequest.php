@@ -17,6 +17,13 @@ class UserRequest extends FormRequest
         return true;
     }
 
+
+    /**
+     * Manipular falha de validação e retornar uma resposta JSON com os erros de validação.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator O objeto de validação que contém os erros de validação.
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     */
     protected function failedValidation(Validator $validator) 
     {
         throw new HttpResponseException(response()->json([
@@ -26,7 +33,7 @@ class UserRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Retorna as regras de validação para os dados do usuário.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
@@ -42,6 +49,13 @@ class UserRequest extends FormRequest
             'password' => 'required | min:6'
         ];
     }
+
+
+    /**
+     * Retorna as mensagens de erro personalizadas para as regras de validação.
+     *
+     * @return array
+     */
     public function messages():array
     {
         return[
