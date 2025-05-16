@@ -66,9 +66,12 @@ class UserController extends Controller
 
         try{
             $user = User::create([
-                'name'  => $request->name,
+                'username' => $request->username,
+                'nome' => $request->nome,
+                'telefone' => $request->telefone,
                 'email' => $request->email,
                 'password' => $request->password,
+                'imagem' => $request->has('imagem') ? base64_decode($request->imagem) : null,
             ]);
 
             // operação é concluída com êxito
@@ -110,9 +113,12 @@ class UserController extends Controller
 
         try { 
             $id->update([
-                'name'  => $request->name,
+                'username' => $request->username,
+                'nome' => $request->nome,
+                'telefone' => $request->telefone,
                 'email' => $request->email,
                 'password' => $request->password,
+                'imagem' => $request->has('imagem') ? base64_decode($request->imagem) : null,
             ]);
 
             // operação é concluída com êxito

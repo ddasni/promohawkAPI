@@ -44,7 +44,7 @@ class UserRequest extends FormRequest
 
 
         return [
-            'name' => 'required',
+            'nome' => 'required',
             'email' => 'required | email | unique:users,email,'. ($userID ? $userID->id : null),
             'password' => 'required | min:6'
         ];
@@ -59,7 +59,7 @@ class UserRequest extends FormRequest
     public function messages():array
     {
         return[
-            'name.required' => 'Campo nome é obrigatório!',
+            'nome.required' => 'Campo nome é obrigatório!',
             'email.required' => 'Campo e-mail é obrigatório!',
             'email.email' => 'Necessario enviar e-mail válido!',
             'email.unique' => 'O e-mail já está cadastrado!',

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ProdutoController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -17,4 +18,14 @@ Route::controller(UserController::class)->group(function () {
     Route::post('/users', 'store');          // POST    /users
     Route::put('/users/{id}', 'update');     // PUT     /users/{id}
     Route::delete('/users/{id}', 'destroy'); // DELETE  /users/{id}
+});
+
+
+// Rotas para gerenciamento de Produtos
+Route::controller(ProdutoController::class)->group(function () {
+    Route::get('/produto', 'index');           // GET     /produto
+    Route::get('/produto/{id}', 'show');       // GET     /produto/{id}
+    Route::post('/produto', 'store');          // POST    /produto
+    Route::put('/produto/{id}', 'update');     // PUT     /produto/{id}
+    Route::delete('/produto/{id}', 'destroy'); // DELETE  /produto/{id}
 });
