@@ -13,11 +13,12 @@ use Illuminate\Support\Facades\Route;
 
 // Rotas para gerenciamento de Usuario
 Route::controller(UserController::class)->group(function () {
-    Route::get('/users', 'index');           // GET     /users
-    Route::get('/users/{id}', 'show');       // GET     /users/{id}
-    Route::post('/users', 'store');          // POST    /users
-    Route::put('/users/{id}', 'update');     // PUT     /users/{id}
-    Route::delete('/users/{id}', 'destroy'); // DELETE  /users/{id}
+    Route::get('/users', 'index');                      // GET     /users
+    Route::get('/users/{id}', 'show');                  // GET     /users/{id}
+    Route::post('/users', 'store');                     // POST    /users
+    Route::put('/users/{id}', 'update');                // PUT     /users/{id}
+    Route::post('/users/{id}/imagem', 'updateImage');   // POST    /users/{id}/imagem
+    Route::delete('/users/{id}', 'destroy');            // DELETE  /users/{id}
 });
 
 

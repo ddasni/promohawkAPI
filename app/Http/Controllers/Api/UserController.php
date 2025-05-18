@@ -120,28 +120,13 @@ class UserController extends Controller
         // iniciar a transação
         DB::beginTransaction();
 
-        try { 
-            $imagemPath = $id->imagem; // Mantém a imagem anterior se não enviar nova
-
-            if ($request->hasFile('imagem')) {
-                // Apaga imagem antiga se existir
-                if ($id->imagem && Storage::disk('public')->exists(str_replace('storage/', '', $id->imagem))) {
-                    Storage::disk('public')->delete(str_replace('storage/', '', $id->imagem));
-                }
-            
-                // Salva nova imagem
-                $path = $request->file('imagem')->store('usuarios', 'public'); // corrige aqui
-                $imagemPath = 'storage/' . $path; // caminho acessível
-            }            
-
-
+        try {         
             $id->update([
                 'username' => $request->username,
                 'nome' => $request->nome,
                 'telefone' => $request->telefone,
                 'email' => $request->email,
-                'password' => $request->password,
-                'imagem' => $imagemPath,
+                'password' => $request->password
             ]);
 
             // operação é concluída com êxito
@@ -164,6 +149,55 @@ class UserController extends Controller
             ],400);
         }
     }
+
+
+    /**
+     * Atualizar a imagem de um usuário existente com base nos dados fornecidos na requisição.
+     * 
+     * @param  \App\Http\Requests\UserRequest  $request O objeto de requisição contendo os dados do usuário a ser atualizado.
+     * @param  \App\Models\User  $id O usuário a ser atualizado.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateImage(Request $request, User $id): JsonResponse
+    {
+        DB::beginTransaction();
+
+        try {
+            if (!$request->hasFile('imagem')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Nenhuma imagem enviada.',
+                ], 400);
+            }
+
+            // Deletar imagem antiga se existir
+            if ($id->imagem && Storage::disk('public')->exists(str_replace('storage/', '', $id->imagem))) {
+                Storage::disk('public')->delete(str_replace('storage/', '', $id->imagem));
+            }
+
+            // Armazenar nova imagem
+            $path = $request->file('imagem')->store('usuarios', 'public');
+            $id->imagem = 'storage/' . $path;
+            $id->save();
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'user' => $id,
+                'message' => 'Imagem atualizada com sucesso!',
+            ], 200);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Erro ao atualizar imagem.',
+            ], 400);
+        }
+    }
+
     
 
     /**
