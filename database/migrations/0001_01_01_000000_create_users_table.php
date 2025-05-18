@@ -45,7 +45,7 @@ return new class extends Migration
         //     $table->string('email', 100)->unique();
         //     $table->timestamp('email_verified_at')->nullable(); // Marca quando o e-mail foi verificado
         //     $table->string('password', 170);
-        //     $table->binary('imagem')->nullable(); // nullable -> não obrigatorio
+        //     $table->string('imagem')->nullable(); // caminho para a imagem
         //     $table->rememberToken(); // Guardar um token para login persistente (lembre-se de mim)
         //     $table->timestamps(); // adiciona created_at e updated_at, ou seja, data e hora
         //              // em em que o registro foi criado e última atualização desse registro

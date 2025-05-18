@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 // @return \illuminate\Http\JsonResponse;
 
@@ -65,13 +66,21 @@ class UserController extends Controller
         DB::beginTransaction();
 
         try{
+            $imagemPath = null;
+
+            if ($request->hasFile('imagem')) {
+                $path = $request->file('imagem')->store('usuarios', 'public'); // corrige aqui
+                $imagemPath = 'storage/' . $path; // caminho acessível
+            }            
+
+
             $user = User::create([
                 'username' => $request->username,
                 'nome' => $request->nome,
                 'telefone' => $request->telefone,
                 'email' => $request->email,
                 'password' => $request->password,
-                'imagem' => $request->has('imagem') ? base64_decode($request->imagem) : null,
+                'imagem' => $imagemPath,
             ]);
 
             // operação é concluída com êxito
@@ -112,13 +121,27 @@ class UserController extends Controller
         DB::beginTransaction();
 
         try { 
+            $imagemPath = $id->imagem; // Mantém a imagem anterior se não enviar nova
+
+            if ($request->hasFile('imagem')) {
+                // Apaga imagem antiga se existir
+                if ($id->imagem && Storage::disk('public')->exists(str_replace('storage/', '', $id->imagem))) {
+                    Storage::disk('public')->delete(str_replace('storage/', '', $id->imagem));
+                }
+            
+                // Salva nova imagem
+                $path = $request->file('imagem')->store('usuarios', 'public'); // corrige aqui
+                $imagemPath = 'storage/' . $path; // caminho acessível
+            }            
+
+
             $id->update([
                 'username' => $request->username,
                 'nome' => $request->nome,
                 'telefone' => $request->telefone,
                 'email' => $request->email,
                 'password' => $request->password,
-                'imagem' => $request->has('imagem') ? base64_decode($request->imagem) : null,
+                'imagem' => $imagemPath,
             ]);
 
             // operação é concluída com êxito

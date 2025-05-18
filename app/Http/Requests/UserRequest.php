@@ -46,7 +46,8 @@ class UserRequest extends FormRequest
         return [
             'nome' => 'required',
             'email' => 'required | email | unique:users,email,'. ($userID ? $userID->id : null),
-            'password' => 'required | min:6'
+            'password' => 'required | min:6',
+            'imagem' => 'required|image|mimes:jpg,png,jpeg,gif,svg|max:2048',
         ];
     }
 
