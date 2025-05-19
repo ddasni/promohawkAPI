@@ -42,10 +42,24 @@ class UserRequest extends FormRequest
         // Recuperar o id do usuario enviado na URL
         $userID = $this->route('id');
 
+        // Verifica se é um metodo put
+        $userUpdate = $this->isMethod('put') || $this->isMethod('patch');
 
+        // se for um metodo put vai usar essa regra
+        if ($userUpdate) {
+            return [
+                'nome' => 'sometimes',
+                'telefone' => 'sometimes',
+                'email' => 'sometimes|email|unique:users,email,' . ($userID ? $userID->id : 'null'),
+                'password' => 'sometimes|min:6',
+            ];
+        }
+
+        // se não
         return [
             'nome' => 'required',
-            'email' => 'required | email | unique:users,email,'. ($userID ? $userID->id : null),
+            'telefone' => 'required',
+            'email' => 'required | email | unique:users,email,',
             'password' => 'required | min:6',
         ];
     }
