@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProdutoController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -10,6 +11,17 @@ use Illuminate\Support\Facades\Route;
 // Route::post('/users', [UserController::class, 'store']); //Metodo => POST | URL:()
 // Route::put('/users/{id}', [UserController::class, 'update']); //Metodo => PUT | URL:()
 // Route::delete('/users/{id}', [UserController::class, 'destroy']); //Metodo => DELETE | URL:()
+
+
+// Rotas para gerenciamento de Login e Logout 
+// O auth:sanctum é uma proteção de rota do Sanctum
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
+});
+
 
 // Rotas para gerenciamento de Usuario
 Route::controller(UserController::class)->group(function () {
