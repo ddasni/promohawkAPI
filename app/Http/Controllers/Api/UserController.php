@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserImageRequest;
 use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Exception;
@@ -36,6 +37,7 @@ class UserController extends Controller
     }
 
 
+
      /**
      * Exibe os detalhes de um usuário específico.
      *
@@ -53,6 +55,7 @@ class UserController extends Controller
     }
 
     
+
     /**
      * Cria um novo usuário com os dados fornecidos na requisição.
      * 
@@ -60,27 +63,17 @@ class UserController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(UserRequest $request) {
-        // criar novo usuário
         
         // iniciar a transação
         DB::beginTransaction();
 
         try{
-            $imagemPath = null;
-
-            if ($request->hasFile('imagem')) {
-                $path = $request->file('imagem')->store('usuarios', 'public'); // corrige aqui
-                $imagemPath = 'storage/' . $path; // caminho acessível
-            }            
-
-
             $user = User::create([
                 'username' => $request->username,
                 'nome' => $request->nome,
                 'telefone' => $request->telefone,
                 'email' => $request->email,
-                'password' => $request->password,
-                'imagem' => $imagemPath,
+                'password' => $request->password
             ]);
 
             // operação é concluída com êxito
@@ -101,11 +94,13 @@ class UserController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => "Usuario não cadastrado",
+                'error' => $e->getMessage(),
             ],400);
         }
     }
 
 
+    
      /**
      * Atualizar os dados de um usuário existente com base nos dados fornecidos na requisição.
      * 
@@ -115,8 +110,6 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, User $id) : JsonResponse
     {
-        // atualizar usuário
-
         // iniciar a transação
         DB::beginTransaction();
 
@@ -146,19 +139,104 @@ class UserController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => "Usuario não editado",
+                'error' => $e->getMessage(),
             ],400);
         }
     }
+
+    
+
+    /**
+     * Excluir o usuário no banco de dados.
+     * 
+     * @param  \App\Models\User  $id O usuário a ser excluído.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(User $id) : JsonResponse
+    {
+        try {
+
+            $id->delete();
+
+            return response()->json([
+                'status' => true,
+                'user' => $id,
+                'message' => "Usuario apagado com sucesso!",
+            ],200);
+
+        } catch (Exception $e) {
+
+             // retorna uma mensagem de erro com status 400
+             return response()->json([
+                 'status' => false,
+                 'message' => "Usuario não apagado",
+                 'error' => $e->getMessage(),
+             ],400);
+        }
+    }
+
+
+
+    /**
+     * Cadastrar uma imagem de um usuário existente com base nos dados fornecidos na requisição.
+     * 
+     * @param  \App\Http\Requests\UserImageRequest  $request O objeto de requisição contendo os dados da imagem a ser atualizada.
+     * @param  \App\Models\User  $id O usuário a ser atualizado.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function createImage (UserImageRequest $request, User $id) : JsonResponse 
+    {
+        DB::beginTransaction();
+
+        try {
+            // Verificando se uma imagem foi enviada
+            if (!$request->hasFile('imagem')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Nenhuma imagem enviada.',
+                ], 400);
+            }
+
+            // Armazendo a imagem e criando a pasta para ela
+            $path = $request->file('imagem')->store('usuarios', 'public');
+            $imagemPath = 'storage/' . $path;
+
+            // Atualiza o usuário com a imagem
+            $id->imagem = $imagemPath;
+            $id->save();
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Imagem cadastrada com sucesso.',
+                'data' => [
+                    'user_id' => $id->id,
+                    'imagem' => $imagemPath,
+                ],
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Erro ao cadastrar imagem.',
+                'error' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
 
 
     /**
      * Atualizar a imagem de um usuário existente com base nos dados fornecidos na requisição.
      * 
-     * @param  \App\Http\Requests\UserRequest  $request O objeto de requisição contendo os dados do usuário a ser atualizado.
+     * @param  \App\Http\Requests\UserImageRequest  $request O objeto de requisição contendo os dados da imagem a ser atualizada.
      * @param  \App\Models\User  $id O usuário a ser atualizado.
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateImage(Request $request, User $id): JsonResponse
+    public function updateImage(UserImageRequest $request, User $id): JsonResponse
     {
         DB::beginTransaction();
 
@@ -194,39 +272,8 @@ class UserController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Erro ao atualizar imagem.',
+                'error' => $e->getMessage(),
             ], 400);
-        }
-    }
-
-    
-
-    /**
-     * Excluir o usuário no banco de dados.
-     * 
-     * @param  \App\Models\User  $id O usuário a ser excluído.
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy(User $id) : JsonResponse
-    {
-        // deletar usuário
-        
-        try {
-
-            $id->delete();
-
-            return response()->json([
-                'status' => true,
-                'user' => $id,
-                'message' => "Usuario apagado com sucesso!",
-            ],200);
-
-        } catch (Exception $e) {
-
-             // retorna uma mensagem de erro com status 400
-             return response()->json([
-                 'status' => false,
-                 'message' => "Usuario não apagado",
-             ],400);
         }
     }
 }

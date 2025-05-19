@@ -6,14 +6,13 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UserRequest extends FormRequest
+class UserImageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        // habilitar uma autorização. padrão false
         return true;
     }
 
@@ -32,21 +31,17 @@ class UserRequest extends FormRequest
         ], 422));
     }
 
+    
+
     /**
-     * Retorna as regras de validação para os dados do usuário.
+     * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        // Recuperar o id do usuario enviado na URL
-        $userID = $this->route('id');
-
-
         return [
-            'nome' => 'required',
-            'email' => 'required | email | unique:users,email,'. ($userID ? $userID->id : null),
-            'password' => 'required | min:6',
+            'imagem' => 'required|image|mimes:jpg,png,jpeg|max:5048',
         ];
     }
 
@@ -59,12 +54,9 @@ class UserRequest extends FormRequest
     public function messages():array
     {
         return[
-            'nome.required' => 'Campo nome é obrigatório!',
-            'email.required' => 'Campo e-mail é obrigatório!',
-            'email.email' => 'Necessario enviar e-mail válido!',
-            'email.unique' => 'O e-mail já está cadastrado!',
-            'password.required' => 'Campo senha é obrigatório!',
-            'password.min' => 'Senha com no mínimo :min caracteres!',
+            'imagem.image' => 'O arquivo enviado deve ser uma imagem válida.',
+            'imagem.mimes' => 'A imagem deve estar em um dos seguintes formatos :mimes.',
+            'imagem.max' => 'A imagem não pode ter mais que 5MB.',
         ];
     }
 }
