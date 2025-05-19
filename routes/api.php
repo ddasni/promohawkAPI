@@ -31,8 +31,8 @@ Route::controller(UserController::class)->group(function () {
     Route::put('/users/{id}', 'update');      // PUT     /users/{id}
     Route::delete('/users/{id}', 'destroy');  // DELETE  /users/{id}
 
-    Route::post('/users/{id}/addImagem', 'createImage');    // POST  /users/{id}/addImagem
-    Route::post('/users/{id}/editImagem', 'updateImage');  // POST  /users/{id}/updateImagem
+    Route::post('/users/{id}/addImage', 'createImage');    // POST  /users/{id}/addImagem
+    Route::post('/users/{id}/editImage', 'updateImage');  // POST  /users/{id}/updateImagem
 });
 
 
