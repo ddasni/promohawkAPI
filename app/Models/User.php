@@ -48,4 +48,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    // Verificar isso
+    public function favoritos()
+    {
+        return $this->belongsToMany(Produto::class, 'favoritos', 'usuario_id', 'produto_id');
+    }
 }

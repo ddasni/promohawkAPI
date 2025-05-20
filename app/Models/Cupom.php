@@ -9,4 +9,19 @@ class Cupom extends Model
 {
     /** @use HasFactory<\Database\Factories\CupomFactory> */
     use HasFactory;
+
+    protected $table = 'cupom';
+
+    protected $fillable = [
+        'loja_id',
+        'codigo',
+        'desconto',
+        'validade',
+        'status_cupom',
+    ];
+
+    public function loja()
+    {
+        return $this->belongsTo(Loja::class);
+    }
 }

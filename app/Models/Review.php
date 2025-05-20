@@ -9,4 +9,29 @@ class Review extends Model
 {
     /** @use HasFactory<\Database\Factories\ReviewFactory> */
     use HasFactory;
+
+    protected $table = 'review';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'produto_id',
+        'usuario_id',
+        'avaliacao_produto',
+        'comentario_produto',
+    ];
+
+    public function Produto()
+    {
+        return $this->belongsTo(Produto::class);
+    }
+
+    public function User()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }
