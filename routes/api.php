@@ -20,8 +20,8 @@ Route::prefix('auth')->group(function () {
 
     Route::controller(AuthController::class)->group(function () {
         Route::post('/login', 'login');
-        Route::post('/forgot-password', 'forgotPassword');
-        Route::post('/reset-password', 'resetPassword');
+        Route::post('/forgot-password', 'forgotPassword')->name('auth.forgot-password');
+        Route::post('/reset-password', 'resetPassword')->name('auth.reset-password');
     });
     
 
