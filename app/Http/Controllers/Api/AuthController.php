@@ -7,8 +7,11 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -48,6 +51,8 @@ class AuthController extends Controller
         ], 200);
     }
 
+
+    
     /**
      * Realiza o logout apagando o token atual.
      *
@@ -74,6 +79,8 @@ class AuthController extends Controller
         }
     }
 
+
+
     /**
      * Retorna os dados do usuário autenticado.
      *
@@ -86,5 +93,59 @@ class AuthController extends Controller
             'status' => true,
             'user' => $request->user(),
         ], 200);
+    }
+
+
+
+    /**
+     * recebe o e-mail do usuário como argumento e utiliza a classe 
+     * Password do Laravel para enviar o link de redefinição de senha.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        Password::sendResetLink($request->only('email'));
+
+        return response()->json(status: Response::HTTP_OK);
+    }
+
+
+
+    /**
+     * recebe o token, o e-mail e a nova senha como argumentos e utiliza a 
+     * classe Password do Laravel para redefinir a senha do usuário.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'token' => 'required|string',
+            'email' => 'required|email',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+                $user->save();
+            }
+        );
+
+        if ($status == Password::PASSWORD_RESET) {
+            return response()->json(status: Response::HTTP_OK);
+        }
+
+        return response()->json(['message' => 'Erro ao redefinir a senha'], status: Response::HTTP_BAD_REQUEST);
     }
 }
