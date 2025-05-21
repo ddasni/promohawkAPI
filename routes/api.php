@@ -13,13 +13,23 @@ use Illuminate\Support\Facades\Route;
 // Route::delete('/users/{id}', [UserController::class, 'destroy']); //Metodo => DELETE | URL:()
 
 
-// Rotas para gerenciamento de Login e Logout 
+// Rotas para gerenciamento de Login e Logout
+// utilização do prefix para agrupar tudo em uma rota auth
 // O auth:sanctum é uma proteção de rota do Sanctum
-Route::post('/login', [AuthController::class, 'login']);
+Route::prefix('auth')->group(function () {
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/me', [AuthController::class, 'me']);
+    Route::controller(AuthController::class)->group(function () {
+        Route::post('/login', 'login');
+        Route::post('/forgot-password', 'forgotPassword')->name('auth.forgot-password');
+        Route::post('/reset-password', 'resetPassword')->name('auth.reset-password');
+    });
+    
+
+    // Rotas protegidas do AuthController
+    Route::middleware('auth:sanctum')->controller(AuthController::class)->group(function () {
+        Route::post('/logout', 'logout');
+        Route::get('/me', 'me');
+    });
 });
 
 
