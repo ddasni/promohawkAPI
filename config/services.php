@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'frontend' => [
+    'url' => env('FRONTEND_URL', 'https://promohawk.com.br'),
+    ],
+
 ];
