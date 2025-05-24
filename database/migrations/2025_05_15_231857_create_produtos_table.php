@@ -8,30 +8,69 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Criar as tabelas
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id(); // increments -> chave primária auto_increment
-            $table->unsignedBigInteger('preco_id');
-            $table->string('username', 30);
+        // cria a tabela Loja
+        Schema::create('loja', function (Blueprint $table) {
+            $table->id();
+            $table->string('nome', 100)->unique();
+            $table->text('imagem')->nullable();
+        });
+
+
+        // cria a tabela categoria
+        Schema::create('categoria', function (Blueprint $table) {
+            $table->id();
+            $table->string('nome', 100)->unique();
+            $table->text('imagem')->nullable();
+        });
+
+
+        // cria a tabela produto
+        Schema::create('produto', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('loja_id')->constrained('loja');
+            $table->foreignId('categoria_id')->constrained('categoria');
             $table->string('nome', 100);
-            $table->string('telefone', 15);
-            $table->string('email', 100)->unique();
-            $table->timestamp('email_verified_at')->nullable(); // Marca quando o e-mail foi verificado
-            $table->string('password', 170);
-            $table->string('imagem')->nullable(); // caminho para a imagem
-            $table->rememberToken(); // Guardar um token para login persistente (lembre-se de mim)
-            $table->timestamps(); // adiciona created_at e updated_at, ou seja, data e hora
-                     // em em que o registro foi criado e última atualização desse registro
+            $table->string('descricao', 200)->default('não possui descrição');
+            $table->text('imagem');
+            $table->text('link');
+            $table->string('status_produto', 15)->default('ativo');
+        });
+
+
+        // cria a tabela preco_produto
+        Schema::create('preco_produto', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('produto_id')->constrained('produto')->onDelete('cascade');
+            $table->foreignId('loja_id')->constrained('loja');
+            $table->decimal('preco', 7, 2);
+            $table->timestamp('data_registro')->useCurrent();
+        });
+
+
+        // cria a tabela cupom
+        Schema::create('cupom', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('loja_id')->constrained('loja');
+            $table->string('codigo', 50)->unique();
+            $table->decimal('desconto', 5, 2);
+            $table->dateTime('validade');
+            $table->string('status_cupom', 15)->default('ativo');
         });
     }
 
     /**
      * Reverse the migrations.
+     * Apagar as tabelas
      */
     public function down(): void
     {
-        Schema::dropIfExists('produtos');
+        Schema::dropIfExists('preco_produto');
+        Schema::dropIfExists('produto');
+        Schema::dropIfExists('categoria');
+        Schema::dropIfExists('loja');
     }
 };
