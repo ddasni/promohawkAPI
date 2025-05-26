@@ -23,7 +23,7 @@ class LojaController extends Controller
     public function index()
     {
         // Recupera os lojas do banco de dados, ordenados por id em ordem decrescente
-        $lojas = Loja::orderBy('id', 'DESC')->get();
+        $lojas = Loja::with(['produtos', 'cupons'])->orderBy('id', 'DESC')->get();
 
         // Retorna os lojas recuperados com uma resposta JSON
         return response()->json([
@@ -44,6 +44,8 @@ class LojaController extends Controller
     */
     public function show(Loja $id)
     {
+        $id->load(['produtos', 'cupons']);
+
         return response()->json([
             'status' => true,
             'loja' => $id,
