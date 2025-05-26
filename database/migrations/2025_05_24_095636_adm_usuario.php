@@ -12,27 +12,27 @@ return new class extends Migration
     public function up(): void
     {
         
-        // Tabela de favoritos
-        Schema::create('favoritos', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('usuario_id');
-            $table->unsignedBigInteger('produto_id');
-            $table->foreign('usuario_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('produto_id')->references('id')->on('produto')->onDelete('cascade');
-            $table->unique(['usuario_id', 'produto_id']);
-        });
+        // // Tabela de favoritos
+        // Schema::create('favoritos', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->unsignedBigInteger('usuario_id');
+        //     $table->unsignedBigInteger('produto_id');
+        //     $table->foreign('usuario_id')->references('id')->on('users')->onDelete('cascade');
+        //     $table->foreign('produto_id')->references('id')->on('produto')->onDelete('cascade');
+        //     $table->unique(['usuario_id', 'produto_id']);
+        // });
 
 
-        // Tabela de review
-        Schema::create('review', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('produto_id');
-            $table->unsignedBigInteger('usuario_id');
-            $table->foreign('produto_id')->references('id')->on('produto')->onDelete('cascade');
-            $table->foreign('usuario_id')->references('id')->on('users')->onDelete('cascade');
-            $table->integer('avaliacao_produto');
-            $table->text('comentario_produto');
-        });
+        // // Tabela de review
+        // Schema::create('review', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->unsignedBigInteger('produto_id');
+        //     $table->unsignedBigInteger('usuario_id');
+        //     $table->foreign('produto_id')->references('id')->on('produto')->onDelete('cascade');
+        //     $table->foreign('usuario_id')->references('id')->on('users')->onDelete('cascade');
+        //     $table->integer('avaliacao_produto');
+        //     $table->text('comentario_produto');
+        // });
     }
 
     /**
