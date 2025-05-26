@@ -3,46 +3,45 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-
-use App\Http\Requests\CategoriaRequest;
-use App\Models\Categoria;
+use App\Http\Requests\AdmRequest;
+use App\Models\Adm;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
-class CategoriaController extends Controller
+class AdmController extends Controller
 {
     public function index(): JsonResponse
     {
-        $categorias = Categoria::orderBy('id', 'DESC')->get();
+        $adms = Adm::orderBy('id', 'DESC')->get();
 
         return response()->json([
             'status' => true,
-            'categorias' => $categorias,
+            'adms' => $adms,
         ]);
     }
 
-    public function show(Categoria $id): JsonResponse
+    public function show(Adm $id): JsonResponse
     {
         return response()->json([
             'status' => true,
-            'categoria' => $id,
+            'adm' => $id,
         ]);
     }
 
-    public function store(CategoriaRequest $request): JsonResponse
+    public function store(AdmRequest $request): JsonResponse
     {
         DB::beginTransaction();
 
         try {
-            $categoria = Categoria::create($request->validated());
+            $adm = Adm::create($request->validated());
 
             DB::commit();
 
             return response()->json([
                 'status' => true,
-                'categoria' => $categoria,
-                'message' => 'Categoria cadastrada com sucesso!',
+                'adm' => $adm,
+                'message' => 'Administrador cadastrado com sucesso!',
             ], 201);
 
         } catch (Exception $e) {
@@ -50,13 +49,13 @@ class CategoriaController extends Controller
 
             return response()->json([
                 'status' => false,
-                'message' => 'Categoria não cadastrada.',
+                'message' => 'Administrador não cadastrado.',
                 'error' => $e->getMessage(),
             ], 400);
         }
     }
 
-    public function update(CategoriaRequest $request, Categoria $id): JsonResponse
+    public function update(AdmRequest $request, Adm $id): JsonResponse
     {
         DB::beginTransaction();
 
@@ -67,8 +66,8 @@ class CategoriaController extends Controller
 
             return response()->json([
                 'status' => true,
-                'categoria' => $id,
-                'message' => 'Categoria atualizada com sucesso!',
+                'adm' => $id,
+                'message' => 'Administrador atualizado com sucesso!',
             ]);
 
         } catch (Exception $e) {
@@ -76,26 +75,26 @@ class CategoriaController extends Controller
 
             return response()->json([
                 'status' => false,
-                'message' => 'Categoria não atualizada.',
+                'message' => 'Administrador não atualizado.',
                 'error' => $e->getMessage(),
             ], 400);
         }
     }
 
-    public function destroy(Categoria $id): JsonResponse
+    public function destroy(Adm $id): JsonResponse
     {
         try {
             $id->delete();
 
             return response()->json([
                 'status' => true,
-                'message' => 'Categoria deletada com sucesso!',
+                'message' => 'Administrador deletado com sucesso!',
             ]);
 
         } catch (Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'Erro ao deletar categoria.',
+                'message' => 'Erro ao deletar administrador.',
                 'error' => $e->getMessage(),
             ], 400);
         }
