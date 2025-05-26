@@ -40,7 +40,7 @@ class LojaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nome' => 'required|string|max:100'|'unique:loja,nome',
+            'nome' => 'required|string|max:100|unique:loja,nome',
             'imagem' => 'nullable|string',
         ];
     }

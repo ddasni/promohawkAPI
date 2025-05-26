@@ -22,7 +22,7 @@ class CategoriaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nome' => 'required|string|max:100'|'unique:categoria,nome',
+            'nome' => 'required|string|max:100|unique:categoria,nome',
             'imagem' => 'nullable|string',
         ];
     }
