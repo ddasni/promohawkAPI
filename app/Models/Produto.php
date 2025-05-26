@@ -39,7 +39,7 @@ class Produto extends Model
 
     public function precos()
     {
-        return $this->hasMany(HistoricoPreco::class);
+        return $this->hasMany(PrecoProduto::class);
     }
 
     public function reviews()
