@@ -22,7 +22,7 @@ class CategoriaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nome' => 'required|string|max:100',
+            'nome' => 'required|string|max:100'|'unique:categoria,nome',
             'imagem' => 'nullable|string',
         ];
     }
@@ -37,6 +37,7 @@ class CategoriaRequest extends FormRequest
     {
         return[
             'nome.required' => 'Campo nome da categoria é obrigatório!',
+            'nome.unique' => 'Esta categoria já está cadastrada.',
         ];
     }
 }

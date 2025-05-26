@@ -40,7 +40,7 @@ class LojaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nome' => 'required|string|max:100',
+            'nome' => 'required|string|max:100'|'unique:loja,nome',
             'imagem' => 'nullable|string',
         ];
     }
@@ -55,6 +55,7 @@ class LojaRequest extends FormRequest
     {
         return[
             'nome.required' => 'Campo nome da loja é obrigatório!',
+            'nome.unique' => 'Esta loja já está cadastrada.',
         ];
     }
 }
