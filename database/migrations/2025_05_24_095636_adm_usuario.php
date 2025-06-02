@@ -20,6 +20,7 @@ return new class extends Migration
         //     $table->foreign('usuario_id')->references('id')->on('users')->onDelete('cascade');
         //     $table->foreign('produto_id')->references('id')->on('produto')->onDelete('cascade');
         //     $table->unique(['usuario_id', 'produto_id']);
+        //     $table->timestamps();
         // });
 
 
@@ -32,6 +33,7 @@ return new class extends Migration
         //     $table->foreign('usuario_id')->references('id')->on('users')->onDelete('cascade');
         //     $table->integer('avaliacao_produto');
         //     $table->text('comentario_produto');
+        //     $table->timestamps();
         // });
     }
 

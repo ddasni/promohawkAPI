@@ -17,6 +17,7 @@ return new class extends Migration
         //     $table->id();
         //     $table->string('nome', 100)->unique();
         //     $table->text('imagem')->nullable();
+        //     $table->timestamps();
         // });
 
 
@@ -25,6 +26,7 @@ return new class extends Migration
         //     $table->id();
         //     $table->string('nome', 100)->unique();
         //     $table->text('imagem')->nullable();
+        //     $table->timestamps();
         // });
 
 
@@ -35,9 +37,18 @@ return new class extends Migration
         //     $table->foreignId('categoria_id')->constrained('categoria');
         //     $table->string('nome', 100);
         //     $table->string('descricao', 200)->default('não possui descrição');
-        //     $table->text('imagem');
         //     $table->text('link');
         //     $table->string('status_produto', 15)->default('ativo');
+        //     $table->timestamps();
+        // });
+
+
+        // // cria a tabela imagem_produto
+        // Schema::create('imagem_produto', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->foreignId('produto_id')->constrained('produto');
+        //     $table->text('imagem');
+        //     $table->timestamps();
         // });
 
 
@@ -47,7 +58,10 @@ return new class extends Migration
         //     $table->foreignId('produto_id')->constrained('produto')->onDelete('cascade');
         //     $table->foreignId('loja_id')->constrained('loja');
         //     $table->decimal('preco', 7, 2);
-        //     $table->timestamp('data_registro')->useCurrent();
+        //     $table->string('forma_pagamento', 50)->nullable(); // Ex: "boleto", "cartao", "pix"
+        //     $table->integer('parcelas')->nullable();           // Ex: 10
+        //     $table->decimal('valor_parcela', 7, 2)->nullable(); // Ex: 49.90
+        //     $table->timestamps();
         // });
 
 
@@ -59,6 +73,7 @@ return new class extends Migration
         //     $table->decimal('desconto', 5, 2);
         //     $table->dateTime('validade');
         //     $table->string('status_cupom', 15)->default('ativo');
+        //     $table->timestamps();
         // });
     }
 

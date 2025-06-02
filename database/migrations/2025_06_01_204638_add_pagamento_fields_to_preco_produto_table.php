@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('preco_produto', function (Blueprint $table) {
-            $table->dropColumn('data_registro');
+            $table->string('forma_pagamento')->nullable();
+            $table->integer('parcelas')->nullable();
+            $table->decimal('valor_parcela', 10, 2)->nullable();
         });
     }
 
@@ -22,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('preco_produto', function (Blueprint $table) {
-            $table->string('data_registro')->nullable(); // ou ajuste conforme o tipo original
+            $table->dropColumn(['forma_pagamento', 'parcelas', 'valor_parcela']);
         });
     }
 };
