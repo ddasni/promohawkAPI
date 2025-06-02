@@ -7,6 +7,7 @@ use App\Http\Requests\CategoriaRequest;
 use App\Http\Requests\LojaRequest;
 use App\Http\Requests\ProdutoRequest;
 use App\Models\Categoria;
+use App\Models\ImagemProduto;
 use App\Models\Loja;
 use App\Models\PrecoProduto;
 use App\Models\Produto;
@@ -77,6 +78,8 @@ class ProdutoController extends Controller
         app(LojaRequest::class)->validateResolved();
         app(CategoriaRequest::class)->validateResolved();
 
+        // aumentando temporariamente o limite de memoria
+        ini_set('memory_limit', '1024M');
 
         DB::beginTransaction();
 
@@ -108,17 +111,29 @@ class ProdutoController extends Controller
                     'descricao' => $request->descricao ?? null,
                     'categoria_id' => $categoria->id,
                     'loja_id' => $loja->id,
-                    'imagem' => $request->imagem,
-                    'link' => $request->link
+                    'link' => $request->link,
+                    'status_produto' => $request->status_produto ?? 'ativo'
                 ]);
             }
 
+            // Salvar imagens adicionais se enviadas como array
+            if ($request->has('imagens') && is_array($request->imagens)) {
+                foreach ($request->imagens as $img) {
+                    ImagemProduto::create([
+                        'produto_id' => $produto->id,
+                        'imagem' => $img
+                    ]);
+                }
+            }
 
             // Registrando o preço do produto
             $preco = PrecoProduto::create([
                 'produto_id' => $produto->id,
                 'loja_id' => $loja->id,
                 'preco' => $request->preco,
+                'forma_pagamento' => $request->forma_pagamento,
+                'parcelas' => $request->parcelas,
+                'valor_parcela' => $request->valor_parcela,
                 'data_registro' => now(),
             ]);
 
@@ -159,7 +174,6 @@ class ProdutoController extends Controller
             $id->update([
                 'nome' => $request->nome,
                 'descricao' => $request->descricao,
-                'imagem' => $request->imagem,
                 'link' => $request->link
             ]);
 

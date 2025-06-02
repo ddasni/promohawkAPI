@@ -24,7 +24,7 @@ class Produto extends Model
         'nome',
         'descricao',
         'link',
-        'status_produto',
+        'status_produto'
     ];
 
     public function loja()
@@ -40,6 +40,11 @@ class Produto extends Model
     public function precos()
     {
         return $this->hasMany(PrecoProduto::class);
+    }
+
+    public function imagens()
+    {
+        return $this->hasMany(ImagemProduto::class, 'produto_id');
     }
 
     public function reviews()
