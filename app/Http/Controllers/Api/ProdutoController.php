@@ -28,9 +28,12 @@ class ProdutoController extends Controller
     */
     public function index()
     {
-        $produtos = Produto::with(['precos' => function ($query) {
-            $query->orderBy('created_at', 'asc'); // histórico organizado
-        }])
+        $produtos = Produto::with([
+            'precos' => function ($query) {
+                $query->orderBy('created_at', 'asc'); // histórico organizado
+            },
+            'imagens'
+        ])
         ->orderBy('id', 'DESC')
         ->get();
 
@@ -53,10 +56,11 @@ class ProdutoController extends Controller
     public function show(Produto $id)
     {
         $produto = Produto::with([
-            'precos' => function ($query) {
-                $query->orderBy('created_at', 'asc');
-            }
-        ])->findOrFail($id->id);
+        'precos' => function ($query) {
+            $query->orderBy('created_at', 'asc');
+        },
+        'imagens'
+    ])->findOrFail($id->id);
 
         return response()->json([
             'status' => true,
