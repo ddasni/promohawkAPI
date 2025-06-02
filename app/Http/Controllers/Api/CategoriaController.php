@@ -14,8 +14,8 @@ class CategoriaController extends Controller
 {
     public function index(): JsonResponse
     {
-        // Carrega as categorias com seus produtos relacionados
-        $categorias = Categoria::with('produtos')->orderBy('id', 'DESC')->get();
+        // Carrega as categorias
+        $categorias = Categoria::orderBy('id', 'DESC')->get();
 
         return response()->json([
             'status' => true,
@@ -26,7 +26,7 @@ class CategoriaController extends Controller
     public function show(Categoria $id): JsonResponse
     {
         // Carrega os produtos da categoria específica
-        $id->load('produtos');
+        // $id->load('produtos');
 
         return response()->json([
             'status' => true,
