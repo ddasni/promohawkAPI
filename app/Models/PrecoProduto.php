@@ -16,6 +16,9 @@ class PrecoProduto extends Model
         'produto_id',
         'loja_id',
         'preco',
+        'forma_pagamento', 
+        'parcelas',       
+        'valor_parcela' 
     ];
 
     public function produto()
