@@ -211,7 +211,7 @@ class UserController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Imagem salva com sucesso.',
-                'data' => [
+                'user' => [
                     'user_id' => $id->id,
                     'imagem' => $id->imagem,
                 ],
