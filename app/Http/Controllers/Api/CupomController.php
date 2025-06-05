@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CupomRequest;
 use App\Models\Cupom;
+use App\Models\Loja;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -64,11 +65,27 @@ class CupomController extends Controller
         DB::beginTransaction();
 
         try{
-            $cupom = Cupom::create([
-                'codigo' => $request->codigo,
-                'desconto' => $request->desconto,
-                'validade' => $request->imagem
+        // Verificando se a loja já existe pelo nome
+        $lojaData = $request->loja;
+
+        $loja = Loja::where('nome', $lojaData['nome'])->first();
+
+        if (!$loja) {
+            // Se não existe, cria a loja
+            $loja = Loja::create([
+                'nome' => $lojaData['nome'],
+                'imagem' => $lojaData['imagem'] ?? null,
             ]);
+        }
+
+        // Cria o cupom com o id da loja
+        $cupom = Cupom::create([
+            'codigo' => $request->codigo,
+            'desconto' => $request->desconto,
+            'validade' => $request->validade,
+            'status_cupom' => $request->status_cupom ?? 'ativo',
+            'loja_id' => $loja->id,
+        ]);
 
             // operação é concluída com êxito
             DB::commit();
@@ -103,11 +120,33 @@ class CupomController extends Controller
         // iniciar a transação
         DB::beginTransaction();
 
-        try {         
+        try {
+            // Verifica se veio uma loja no request
+            $lojaData = $request->input('loja');
+
+            if ($lojaData && isset($lojaData['nome'])) {
+                // Procura a loja pelo nome
+                $loja = Loja::where('nome', $lojaData['nome'])->first();
+
+                if (!$loja) {
+                    // Se não existir, cria a nova loja
+                    $loja = Loja::create([
+                        'nome' => $lojaData['nome'],
+                        'imagem' => $lojaData['imagem'] ?? null,
+                    ]);
+                }
+
+                // Atualiza também a loja do cupom
+                $id->loja_id = $loja->id;
+            }
+            
+
+
             $id->update([
                 'codigo' => $request->codigo,
                 'desconto' => $request->desconto,
-                'validade' => $request->imagem
+                'validade' => $request->validade,
+                'status_cupom' => $request->status_cupom
             ]);
 
             // operação é concluída com êxito

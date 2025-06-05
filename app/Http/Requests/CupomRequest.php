@@ -49,7 +49,7 @@ class CupomRequest extends FormRequest
             'loja_id'       => 'required|exists:loja,id',
             'codigo'        => 'required|string|max:50',
             'desconto'      => 'required|numeric|min:0',
-            'validade'      => 'required|date|after_or_equal:today',
+            'validade'      => 'required|datetime|after_or_equal:today',
             'status_cupom'  => 'sometimes|string|max:15',
         ];
     }
