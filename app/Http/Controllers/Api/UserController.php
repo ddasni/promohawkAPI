@@ -178,65 +178,13 @@ class UserController extends Controller
 
 
     /**
-     * Cadastrar uma imagem de um usuário existente com base nos dados fornecidos na requisição.
+     * Cadastrar ou atualizar uma imagem de um usuário existente com base nos dados fornecidos na requisição.
      * 
      * @param  \App\Http\Requests\UserImageRequest  $request O objeto de requisição contendo os dados da imagem a ser atualizada.
      * @param  \App\Models\User  $id O usuário a ser atualizado.
      * @return \Illuminate\Http\JsonResponse
      */
-    public function createImage (UserImageRequest $request, User $id) : JsonResponse 
-    {
-        DB::beginTransaction();
-
-        try {
-            // Verificando se uma imagem foi enviada
-            if (!$request->hasFile('imagem')) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Nenhuma imagem enviada.',
-                ], 400);
-            }
-
-            // Armazendo a imagem e criando a pasta para ela
-            $path = $request->file('imagem')->store('usuarios', 'public');
-            $imagemPath = 'storage/' . $path;
-
-            // Atualiza o usuário com a imagem
-            $id->imagem = $imagemPath;
-            $id->save();
-
-            DB::commit();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Imagem cadastrada com sucesso.',
-                'data' => [
-                    'user_id' => $id->id,
-                    'imagem' => $imagemPath,
-                ],
-            ]);
-
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Erro ao cadastrar imagem.',
-                'error' => $e->getMessage(),
-            ], 400);
-        }
-    }
-
-
-
-    /**
-     * Atualizar a imagem de um usuário existente com base nos dados fornecidos na requisição.
-     * 
-     * @param  \App\Http\Requests\UserImageRequest  $request O objeto de requisição contendo os dados da imagem a ser atualizada.
-     * @param  \App\Models\User  $id O usuário a ser atualizado.
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function updateImage(UserImageRequest $request, User $id): JsonResponse
+    public function imagem(UserImageRequest $request, User $id): JsonResponse
     {
         DB::beginTransaction();
 
@@ -248,12 +196,12 @@ class UserController extends Controller
                 ], 400);
             }
 
-            // Deletar imagem antiga se existir
+            // se uma imagem já estiver cadastrada, ela será deletada
             if ($id->imagem && Storage::disk('public')->exists(str_replace('storage/', '', $id->imagem))) {
                 Storage::disk('public')->delete(str_replace('storage/', '', $id->imagem));
             }
 
-            // Armazenar nova imagem
+            // se não armazena a nova imagem
             $path = $request->file('imagem')->store('usuarios', 'public');
             $id->imagem = 'storage/' . $path;
             $id->save();
@@ -262,8 +210,11 @@ class UserController extends Controller
 
             return response()->json([
                 'status' => true,
-                'user' => $id,
-                'message' => 'Imagem atualizada com sucesso!',
+                'message' => 'Imagem salva com sucesso.',
+                'data' => [
+                    'user_id' => $id->id,
+                    'imagem' => $id->imagem,
+                ],
             ], 200);
 
         } catch (Exception $e) {
@@ -271,7 +222,7 @@ class UserController extends Controller
 
             return response()->json([
                 'status' => false,
-                'message' => 'Erro ao atualizar imagem.',
+                'message' => 'Erro ao salvar imagem.',
                 'error' => $e->getMessage(),
             ], 400);
         }
