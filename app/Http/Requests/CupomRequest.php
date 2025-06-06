@@ -9,7 +9,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 class CupomRequest extends FormRequest
 {
     /**
-     * Determina se o usuário está autorizado a fazer esta requisição.
+     * Determina se o cupom está autorizado a fazer esta requisição.
      */
     public function authorize(): bool
     {
@@ -39,6 +39,7 @@ class CupomRequest extends FormRequest
             return [
                 'loja_id'       => 'sometimes|exists:loja,id',
                 'codigo'        => 'sometimes|string|max:50',
+                'descricao'     => 'sometimes|string|max:100',
                 'desconto'      => 'sometimes|numeric|min:0',
                 'validade'      => 'sometimes|date|after_or_equal:today',
                 'status_cupom'  => 'sometimes|string|max:15',
@@ -48,6 +49,7 @@ class CupomRequest extends FormRequest
         return [
             'loja_id'       => 'required|exists:loja,id',
             'codigo'        => 'required|string|max:50',
+            'descricao'     => 'required|string|max:100',
             'desconto'      => 'required|numeric|min:0',
             'validade'      => 'required|datetime|after_or_equal:today',
             'status_cupom'  => 'sometimes|string|max:15',
@@ -65,7 +67,11 @@ class CupomRequest extends FormRequest
 
             'codigo.required'          => 'O código do cupom é obrigatório.',
             'codigo.string'            => 'O código deve ser uma string.',
-            'codigo.max'               => 'O código pode ter no máximo 50 caracteres.',
+            'codigo.max'               => 'O código pode ter no máximo :max caracteres.',
+
+            'descricao.required'       => 'A descrição é obrigatŕia.',
+            'descricao.string'         => 'A descrição deve ser uma string.',
+            'descricao.max'            => 'A descrição deve ter no máximo :max caracteres.',
 
             'desconto.required'        => 'O desconto é obrigatório.',
             'desconto.numeric'         => 'O desconto deve ser um número.',

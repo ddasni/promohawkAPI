@@ -15,6 +15,7 @@ class Cupom extends Model
     protected $fillable = [
         'loja_id',
         'codigo',
+        'descricao',
         'desconto',
         'validade',
         'status_cupom',

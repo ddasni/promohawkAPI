@@ -70,6 +70,7 @@ return new class extends Migration
         //     $table->id();
         //     $table->foreignId('loja_id')->constrained('loja');
         //     $table->string('codigo', 50)->unique();
+        //     $table->string('descricao', 100);
         //     $table->decimal('desconto', 5, 2);
         //     $table->dateTime('validade');
         //     $table->string('status_cupom', 15)->default('ativo');

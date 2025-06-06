@@ -82,6 +82,7 @@ class CupomController extends Controller
         $cupom = Cupom::create([
             'codigo' => $request->codigo,
             'desconto' => $request->desconto,
+            'descricao' => $request->descricao,
             'validade' => $request->validade,
             'status_cupom' => $request->status_cupom ?? 'ativo',
             'loja_id' => $loja->id,
@@ -145,6 +146,7 @@ class CupomController extends Controller
             $id->update([
                 'codigo' => $request->codigo,
                 'desconto' => $request->desconto,
+                'descricao'=> $request->descricao,
                 'validade' => $request->validade,
                 'status_cupom' => $request->status_cupom
             ]);
