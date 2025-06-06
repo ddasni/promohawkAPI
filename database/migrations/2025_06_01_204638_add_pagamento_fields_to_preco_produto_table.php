@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('preco_produto', function (Blueprint $table) {
-            $table->string('forma_pagamento')->nullable();
-            $table->integer('parcelas')->nullable();
-            $table->decimal('valor_parcela', 10, 2)->nullable();
-        });
+        // Schema::table('preco_produto', function (Blueprint $table) {
+        //     $table->string('forma_pagamento')->nullable();
+        //     $table->integer('parcelas')->nullable();
+        //     $table->decimal('valor_parcela', 10, 2)->nullable();
+        // });
     }
 
     /**
