@@ -11,12 +11,7 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\ProdutoController;
 use App\Http\Controllers\Api\FavoritoController;
 use App\Http\Controllers\Api\CategoriaController;
-
-// Route::get('/users', [UserController::class, 'index']); //Metodo => GET | URL:()
-// Route::get('/users/{id}', [UserController::class, 'show']); //Metodo => GET | URL:()
-// Route::post('/users', [UserController::class, 'store']); //Metodo => POST | URL:()
-// Route::put('/users/{id}', [UserController::class, 'update']); //Metodo => PUT | URL:()
-// Route::delete('/users/{id}', [UserController::class, 'destroy']); //Metodo => DELETE | URL:()
+use App\Http\Controllers\Api\PrecoProdutoController;
 
 
 // Rotas para gerenciamento de Login e Logout
@@ -100,12 +95,22 @@ Route::controller(CupomController::class)->group(function () {
 
 
 // Rotas para gerenciamento de Produtos
-Route::controller(ProdutoController::class)->group(function () {
+Route::controller(PrecoProdutoController::class)->group(function () {
     Route::get('/produto', 'index');           // GET     /produto
     Route::get('/produto/{id}', 'show');       // GET     /produto/{id}
     Route::post('/produto', 'store');          // POST    /produto
     Route::put('/produto/{id}', 'update');     // PUT     /produto/{id}
     Route::delete('/produto/{id}', 'destroy'); // DELETE  /produto/{id}
+});
+
+
+// Rotas para gerenciamento de Preços do Produtos
+Route::controller(ProdutoController::class)->group(function () {
+    Route::get('/preco', 'index');           // GET     /preco
+    Route::get('/preco/{id}', 'show');       // GET     /preco/{id}
+    Route::post('/preco', 'store');          // POST    /preco
+    Route::put('/preco/{id}', 'update');     // PUT     /preco/{id}
+    Route::delete('/preco/{id}', 'destroy'); // DELETE  /preco/{id}
 });
 
     
