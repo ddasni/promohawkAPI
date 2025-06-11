@@ -147,8 +147,7 @@ class ProdutoController extends Controller
                 'preco' => $request->preco,
                 'forma_pagamento' => $request->forma_pagamento,
                 'parcelas' => $request->parcelas,
-                'valor_parcela' => $request->valor_parcela,
-                'data_registro' => now(),
+                'valor_parcela' => $request->valor_parcela
             ]);
 
             DB::commit();
@@ -185,11 +184,7 @@ class ProdutoController extends Controller
         DB::beginTransaction();
 
         try {         
-            $id->update([
-                'nome' => $request->nome,
-                'descricao' => $request->descricao,
-                'link' => $request->link
-            ]);
+            $id->update($request->validated());
 
             // operação é concluída com êxito
             DB::commit();
