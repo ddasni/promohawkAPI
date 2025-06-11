@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\CategoriaRequest;
-use App\Http\Requests\LojaRequest;
-use App\Http\Requests\ProdutoRequest;
-use App\Models\Categoria;
-use App\Models\ImagemProduto;
-use App\Models\Loja;
-use App\Models\PrecoProduto;
-use App\Models\Produto;
 use Exception;
-use Illuminate\Http\JsonResponse;
+use App\Models\Loja;
+use App\Models\Produto;
+use App\Models\Categoria;
+use App\Models\PrecoProduto;
 use Illuminate\Http\Request;
+use App\Models\ImagemProduto;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\LojaRequest;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ProdutoRequest;
+use App\Http\Requests\CategoriaRequest;
+use App\Http\Resources\ProdutoResource;
+
 
 class ProdutoController extends Controller
 {
@@ -32,10 +34,16 @@ class ProdutoController extends Controller
             'precos.loja' => function ($query) {
                 $query->orderBy('created_at', 'asc'); // histórico organizado
             },
-            'imagens'
+            'imagens',
+            'reviews'
         ])
         ->orderBy('id', 'DESC')
-        ->get();
+        ->get()
+        ->map(function ($produto) {
+            $produto->media_nota = round($produto->reviews->avg('nota'), 1);
+            unset($produto->reviews); // mantendo só a media, sem reviews
+            return $produto;
+        });
 
         return response()->json([
             'status' => true,
@@ -56,17 +64,18 @@ class ProdutoController extends Controller
     public function show(Produto $id)
     {
         $produto = Produto::with([
-        'precos.loja' => function ($query) {
-            $query->orderBy('created_at', 'asc');
-        },
-        'imagens',
-        'loja'
-    ])->findOrFail($id->id);
+            'precos.loja' => function ($query) {
+                $query->orderBy('created_at', 'asc');
+            },
+            'imagens',
+            'loja',
+            'reviews.usuario'
+        ])->findOrFail($id->id);
 
         return response()->json([
             'status' => true,
-            'produto' => $produto,
-        ], 200);
+            'produto' => new ProdutoResource($produto),
+        ]);
     }
 
 
