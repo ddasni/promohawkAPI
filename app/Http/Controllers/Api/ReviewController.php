@@ -3,63 +3,112 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\ReviewRequest;
+use App\Models\Review;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Exception;
 
 class ReviewController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $reviews = Review::with(['produto', 'usuario'])->orderBy('id', 'desc')->get();
+
+        return response()->json([
+            'status' => true,
+            'reviews' => $reviews,
+        ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(Review $id): JsonResponse
     {
-        //
+        $review = Review::with(['produto', 'usuario'])->findOrFail($id->id);
+
+        return response()->json([
+            'status' => true,
+            'review' => $review,
+        ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(ReviewRequest $request): JsonResponse
     {
-        //
+        DB::beginTransaction();
+
+        try {
+            $review = Review::create($request->validated());
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Review cadastrada com sucesso!',
+                'review' => $review,
+            ], 201);
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Erro ao cadastrar review.',
+                'error' => $e->getMessage(),
+            ], 400);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(ReviewRequest $request, Review $id): JsonResponse
     {
-        //
+        DB::beginTransaction();
+
+        try {
+            $id->update($request->validated());
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Review atualizada com sucesso!',
+                'review' => $id,
+            ], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Erro ao atualizar review.',
+                'error' => $e->getMessage(),
+            ], 400);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy(Review $id): JsonResponse
     {
-        //
+        try {
+            $id->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Review deletada com sucesso!',
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Erro ao deletar review.',
+                'error' => $e->getMessage(),
+            ], 400);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function listarPorProduto($produtoId)
     {
-        //
+        $reviews = Review::where('produto_id', $produtoId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'reviews' => $reviews,
+        ], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

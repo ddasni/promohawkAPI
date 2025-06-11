@@ -29,9 +29,9 @@ class Review extends Model
         return $this->belongsTo(Produto::class);
     }
 
-    public function User()
+   public function usuario()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'usuario_id');
     }
 
 }
