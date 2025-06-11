@@ -1,14 +1,16 @@
 <?php
 
-use App\Http\Controllers\Api\AdmController;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\CategoriaController;
-use App\Http\Controllers\Api\CupomController;
-use App\Http\Controllers\Api\LojaController;
-use App\Http\Controllers\Api\ProdutoController;
-use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AdmController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\LojaController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\CupomController;
+use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\Api\ProdutoController;
+use App\Http\Controllers\Api\FavoritoController;
+use App\Http\Controllers\Api\CategoriaController;
 
 // Route::get('/users', [UserController::class, 'index']); //Metodo => GET | URL:()
 // Route::get('/users/{id}', [UserController::class, 'show']); //Metodo => GET | URL:()
@@ -29,7 +31,7 @@ Route::prefix('auth')->group(function () {
     });
     
 
-    // Rotas protegidas do AuthController
+    // Rotas protegidas do AuthController, onde é necessario do token
     Route::middleware('auth:sanctum')->controller(AuthController::class)->group(function () {
         Route::post('/logout', 'logout');
         Route::get('/me', 'me');
@@ -56,6 +58,34 @@ Route::controller(UserController::class)->group(function () {
     Route::delete('/users/{id}', 'destroy');  // DELETE  /users/{id}
 
     Route::post('/users/{id}/imagem', 'imagem');    // POST  /users/{id}/imagem
+});
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    // Rotas protegidas para gerenciamento da Lista de Desejos
+    Route::controller(FavoritoController::class)->group(function () {
+        Route::get('/favorito', 'index');              
+        Route::get('/favorito/{id}', 'show');          
+        Route::post('/favorito', 'store');             
+        Route::put('/favorito/{id}', 'update');        
+        Route::delete('/favorito/{id}', 'destroy');    
+
+        // retorna os favoritos do usuário Logado e autenticado
+        Route::get('/user-favoritos', 'userFavoritos');
+    });
+});
+
+
+// Rotas para gerenciamento das reviews
+Route::middleware('auth:sanctum')->group(function () {
+    // Rotas protegidas para gerenciamento da Lista de Desejos
+    Route::controller(ReviewController::class)->group(function () {
+        Route::get('/review', 'index');              
+        Route::get('/review/{id}', 'show');          
+        Route::post('/review', 'store');             
+        Route::put('/review/{id}', 'update');        
+        Route::delete('/review/{id}', 'destroy');
+    });
 });
 
 
