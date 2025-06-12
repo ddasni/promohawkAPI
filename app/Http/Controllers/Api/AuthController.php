@@ -143,8 +143,8 @@ class AuthController extends Controller
                 ])->setRememberToken(Str::random(60));
                 $user->save();
 
-                 // Enviando um e-mail para notificar a redefinição
-                Mail::to($user->email)->send(new PasswordResetSuccessMail($user->name));
+                // Enviando um e-mail para notificar a redefinição
+                Mail::to($user->email)->send(new ResetPasswordSuccessMail($user->name));
             }
         );
 
