@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use App\Mail\PasswordResetSuccessMail;
+use App\Mail\ResetPasswordSuccessMail;
 use Illuminate\Support\Facades\Mail;
 
 
