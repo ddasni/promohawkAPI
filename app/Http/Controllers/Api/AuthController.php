@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Mail\PasswordResetSuccessMail;
+use Illuminate\Support\Facades\Mail;
+
 
 class AuthController extends Controller
 {
@@ -139,6 +142,9 @@ class AuthController extends Controller
                     'password' => Hash::make($password)
                 ])->setRememberToken(Str::random(60));
                 $user->save();
+
+                 // Enviando um e-mail para notificar a redefinição
+                Mail::to($user->email)->send(new PasswordResetSuccessMail($user->name));
             }
         );
 

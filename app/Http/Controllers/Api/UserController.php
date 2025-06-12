@@ -11,6 +11,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\WelcomeUserMail;
+use Illuminate\Support\Facades\Mail;
 
 // @return \illuminate\Http\JsonResponse;
 
@@ -75,6 +77,9 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => $request->password
             ]);
+
+            // email de boas vindas
+            Mail::to($user->email)->send(new WelcomeUserMail($user->nome));
 
             // operação é concluída com êxito
             DB::commit();
