@@ -95,7 +95,7 @@ Route::controller(CupomController::class)->group(function () {
 
 
 // Rotas para gerenciamento de Produtos
-Route::controller(PrecoProdutoController::class)->group(function () {
+Route::controller(ProdutoController::class)->group(function () {
     Route::get('/produto', 'index');           // GET     /produto
     Route::get('/produto/{id}', 'show');       // GET     /produto/{id}
     Route::post('/produto', 'store');          // POST    /produto
@@ -105,7 +105,7 @@ Route::controller(PrecoProdutoController::class)->group(function () {
 
 
 // Rotas para gerenciamento de Preços do Produtos
-Route::controller(ProdutoController::class)->group(function () {
+Route::controller(PrecoProdutoController::class)->group(function () {
     Route::get('/preco', 'index');           // GET     /preco
     Route::get('/preco/{id}', 'show');       // GET     /preco/{id}
     Route::post('/preco', 'store');          // POST    /preco
