@@ -16,11 +16,11 @@ class PrecoProdutoController extends Controller
      */
     public function index(): JsonResponse
     {
-        $precos = PrecoProduto::orderBy('id', 'DESC')->get();
+        $precos = PrecoProduto::with('loja')->orderBy('id', 'DESC')->get();
 
         return response()->json([
             'status' => true,
-            'precos' => $precos,
+            'precos' => PrecoProdutoResource::collection($precos),
         ], 200);
     }
 
@@ -29,9 +29,11 @@ class PrecoProdutoController extends Controller
      */
     public function show(PrecoProduto $id): JsonResponse
     {
+        $id->load('loja'); // eager load
+
         return response()->json([
             'status' => true,
-            'preco' => $id,
+            'preco' => new PrecoProdutoResource($id),
         ], 200);
     }
 

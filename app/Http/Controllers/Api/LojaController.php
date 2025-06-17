@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LojaRequest;
+use App\Http\Resources\LojaResource;
 use App\Models\Loja;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -28,7 +29,7 @@ class LojaController extends Controller
         // Retorna os lojas recuperados com uma resposta JSON
         return response()->json([
             'status' => true,
-            'lojas' => $lojas,
+            'lojas' => LojaResource::collection($lojas),
         ],200);
     }
 
@@ -48,7 +49,7 @@ class LojaController extends Controller
 
         return response()->json([
             'status' => true,
-            'loja' => $id,
+            'loja' => new LojaResource($id),
         ],200);
     }
 
@@ -60,7 +61,7 @@ class LojaController extends Controller
     * @param  \App\Http\Requests\LojaRequest  $request O objeto de requisição contendo os dados do usuário a ser criado.
     * @return \Illuminate\Http\JsonResponse
     */
-    public function store(Request $request)
+    public function store(LojaRequest $request)
     {
          // iniciar a transação
         DB::beginTransaction();
@@ -68,9 +69,7 @@ class LojaController extends Controller
         try{
             $loja = Loja::create([
                 'nome' => $request->nome,
-                'descricao' => $request->descricao,
-                'imagem' => $request->imagem,
-                'link' => $request->link
+                'imagem' => $request->imagem
             ]);
 
             // operação é concluída com êxito
@@ -78,7 +77,7 @@ class LojaController extends Controller
 
             return response()->json([
                 'status' => true,
-                'loja' => $loja,
+                'loja' => new LojaResource($loja),
                 'message' => "Loja cadastrada com sucesso!",
             ],201);
 
@@ -109,9 +108,7 @@ class LojaController extends Controller
         try {         
             $id->update([
                 'nome' => $request->nome,
-                'descricao' => $request->descricao,
-                'imagem' => $request->imagem,
-                'link' => $request->link
+                'imagem' => $request->imagem
             ]);
 
             // operação é concluída com êxito
@@ -119,7 +116,7 @@ class LojaController extends Controller
 
             return response()->json([
                 'status' => true,
-                'Loja' => $id,
+                'loja' => new LojaResource($id),
                 'message' => "Loja editado com sucesso!",
             ],200);
 

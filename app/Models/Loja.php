@@ -17,6 +17,15 @@ class Loja extends Model
         'imagem',
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($loja) {
+            $loja->nome = ucfirst(strtolower(trim($loja->nome)));
+        });
+    }
+
     public function produtos()
     {
         return $this->hasMany(Produto::class);

@@ -19,17 +19,11 @@ class Produto extends Model
      */
     protected $fillable = [
         'categoria_id',
-        'loja_id',
         'nome',
         'descricao',
         'link',
         'status_produto'
     ];
-
-    public function loja()
-    {
-        return $this->belongsTo(Loja::class);
-    }
 
     public function categoria()
     {

@@ -64,7 +64,6 @@ class ProdutoRequest extends FormRequest
                 'valor_parcela'     => 'nullable|numeric|min:0',
                 'link'              => 'sometimes|string',
                 'status_produto'    => 'sometimes|in:ativo,inativo',
-                'imagem'            => 'sometimes|string',
                 'imagens'           => 'nullable|array',
                 'imagens.*'         => 'string', // cada item do array deve ser uma string (base64 ou URL)
             ];
@@ -78,7 +77,6 @@ class ProdutoRequest extends FormRequest
             'forma_pagamento'   => 'nullable|string|max:50',
             'parcelas'          => 'nullable|integer|min:1',
             'valor_parcela'     => 'nullable|numeric|min:0',
-            'imagem'            => 'required|string',
             'imagens'           => 'nullable|array',
             'imagens.*'         => 'string',
             'link'              => 'required|string',
@@ -98,7 +96,6 @@ class ProdutoRequest extends FormRequest
             'nome.max'              => 'Excedeu mais de :max caracteres no campo nome!',
             'descricao.max'         => 'Excedeu mais de :max caracteres no campo descrição!',
             'preco.required'        => 'Campo preco do produto é obrigatório!',
-            'imagem.required'       => 'Campo imagem do produto é obrigatório!',
             'link.required'         => 'Campo url do produto é obrigatório!',
             'forma_pagamento.max'   => 'O campo forma de pagamento não pode ter mais de :max caracteres.',
             'parcelas.integer'      => 'O número de parcelas deve ser um número inteiro.',
