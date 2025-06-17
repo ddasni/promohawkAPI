@@ -12,6 +12,10 @@ class Cupom extends Model
 
     protected $table = 'cupom';
 
+    protected $casts = [
+        'validade' => 'datetime',
+    ];
+
     protected $fillable = [
         'loja_id',
         'codigo',
