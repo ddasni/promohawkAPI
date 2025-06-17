@@ -129,12 +129,13 @@ class ProdutoController extends Controller
 
 
             // Registrar o preço do produto
-            $produto = Produto::create([
-                'nome' => $request->nome,
-                'descricao' => $request->descricao ?? null,
-                'categoria_id' => $categoria->id,
-                'link' => $request->link,
-                'status_produto' => $request->status_produto ?? 'ativo'
+            $preco = PrecoProduto::create([
+                'produto_id' => $produto->id,
+                'loja_id' => $loja->id,
+                'preco' => $request->preco,
+                'forma_pagamento' => $request->forma_pagamento ?? null,
+                'parcelas' => $request->parcelas ?? null,
+                'valor_parcela' => $request->valor_parcela ?? null,
             ]);
 
             DB::commit();
