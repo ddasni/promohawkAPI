@@ -19,14 +19,14 @@ class CategoriaController extends Controller
 
         return response()->json([
             'status' => true,
-            'categorias' => CupomResource::collection($categorias),
+            'categorias' => CategoriaResource::collection($categorias),
         ]);
     }
 
     public function show(Categoria $id): JsonResponse
     {
         // Carrega os produtos da categoria específica
-        // $id->load('produtos');
+        $id->load('produtos');
 
         return response()->json([
             'status' => true,
