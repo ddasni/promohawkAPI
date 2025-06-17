@@ -10,11 +10,11 @@ class ReviewResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'produto_id' => $this->produto_id,
-            'usuario_id' => $this->usuario_id,
             'avaliacao_produto' => $this->avaliacao_produto,
             'comentario_produto' => $this->comentario_produto,
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->format('d/m/Y H:i'),
+
+            'produto' => new ProdutoResource($this->whenLoaded('produto')),
             'usuario' => new UserResource($this->whenLoaded('usuario')),
         ];
     }
