@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-
+use App\Http\Resources\CategoriaResource;
 use App\Http\Requests\CategoriaRequest;
 use App\Models\Categoria;
 use Exception;
@@ -19,7 +19,7 @@ class CategoriaController extends Controller
 
         return response()->json([
             'status' => true,
-            'categorias' => $categorias,
+            'categorias' => CupomResource::collection($categorias),
         ]);
     }
 
@@ -30,7 +30,7 @@ class CategoriaController extends Controller
 
         return response()->json([
             'status' => true,
-            'categoria' => $id,
+            'categoria' => new CategoriaResource($id),
         ]);
     }
 

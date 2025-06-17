@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FavoritoRequest;
+use App\Http\Resources\FavoritoResource;
 use App\Models\Favorito;
 use App\Models\Produto;
 use App\Models\User;
@@ -20,7 +21,7 @@ class FavoritoController extends Controller
 
         return response()->json([
             'status' => true,
-            'favoritos' => $favoritos
+            'favoritos' => FavoritoResource::collection($favoritos)
         ], 200);
     }
 
@@ -28,7 +29,7 @@ class FavoritoController extends Controller
     {
         return response()->json([
             'status' => true,
-            'favorito' => $id->load(['usuario', 'produto'])
+            'favorito' => new FavoritoResource($id)
         ], 200);
     }
 
@@ -37,13 +38,13 @@ class FavoritoController extends Controller
         $usuario = $request->user();
 
         $favoritos = Favorito::where('usuario_id', $usuario->id)
-            ->with('produto')
+            ->with(['produto.precos.loja'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         return response()->json([
             'status' => true,
-            'favoritos' => $favoritos
+            'favoritos' => FavoritoResource::collection($favoritos)
         ]);
     }
 

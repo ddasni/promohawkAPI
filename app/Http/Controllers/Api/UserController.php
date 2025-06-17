@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserImageRequest;
 use App\Http\Requests\UserRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -26,7 +27,7 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index():JsonResponse
+    public function index(): JsonResponse
     {
         // Recupera os usuarios do banco de dados, ordenados por id em ordem decrescente
         $users = User::orderBy('id', 'DESC')->get();
@@ -34,8 +35,8 @@ class UserController extends Controller
         // Retorna os usuarios recuperados com uma resposta JSON
         return response()->json([
             'status' => true,
-            'usuarios' => $users,
-        ],200);
+            'usuarios' => UserResource::collection($users),
+        ], 200);
     }
 
 
@@ -48,12 +49,12 @@ class UserController extends Controller
      * @param  \App\Models\User  $id O objeto do usuário a ser exibido
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(User $id):JsonResponse
+    public function show(User $id): JsonResponse
     {
         return response()->json([
             'status' => true,
-            'user' => $id,
-        ],200);
+            'user' => new UserResource($id),
+        ], 200);
     }
 
     

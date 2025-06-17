@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CupomRequest;
+use App\Http\Resources\CupomResource;
 use App\Models\Cupom;
 use App\Models\Loja;
 use Exception;
@@ -29,7 +30,7 @@ class CupomController extends Controller
         // Retorna os cupons recuperados com uma resposta JSON
         return response()->json([
             'status' => true,
-            'cupons' => $cupons,
+            'cupons' => CupomResource::collection($cupons),
         ],200);
     }
 
@@ -47,7 +48,7 @@ class CupomController extends Controller
     {
         return response()->json([
             'status' => true,
-            'cupom' => $id,
+            'cupom' => new CupomResource($id),
         ],200);
     }
 

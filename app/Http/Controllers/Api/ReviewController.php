@@ -8,6 +8,7 @@ use App\Models\Review;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use App\Http\Resources\ReviewResource;
 
 class ReviewController extends Controller
 {
@@ -17,7 +18,7 @@ class ReviewController extends Controller
 
         return response()->json([
             'status' => true,
-            'reviews' => $reviews,
+            'reviews' => ReviewResource::collection($reviews),
         ], 200);
     }
 
@@ -27,7 +28,7 @@ class ReviewController extends Controller
 
         return response()->json([
             'status' => true,
-            'review' => $review,
+            'review' => new ReviewResource($review),
         ], 200);
     }
 
