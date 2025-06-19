@@ -247,6 +247,8 @@ class ProdutoController extends Controller
 
             $id->delete();
 
+            $this->clearCache($id);
+
             return response()->json([
                 'status' => true,
                 'produto' => $id,
