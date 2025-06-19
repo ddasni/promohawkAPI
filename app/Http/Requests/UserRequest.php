@@ -48,19 +48,21 @@ class UserRequest extends FormRequest
         // se for um metodo put vai usar essa regra
         if ($userUpdate) {
             return [
-                'nome' => 'sometimes',
-                'telefone' => 'sometimes',
-                'email' => 'sometimes|email|unique:users,email,' . ($userID ? $userID->id : 'null'),
-                'password' => 'sometimes|min:6',
+                'username' => 'sometimes|string|max:30',
+                'nome' => 'sometimes|string|max:100',
+                'telefone' => 'sometimes|string|max:15',
+                'email' => 'sometimes|email|max:100|unique:users,email,' . ($userID ? $userID->id : 'NULL'),
+                'password' => 'sometimes|string|min:6',
             ];
         }
 
-        // se não
+        // se não (criação)
         return [
-            'nome' => 'required',
-            'telefone' => 'required',
-            'email' => 'required | email | unique:users,email,',
-            'password' => 'required | min:6',
+            'username' => 'required|string|max:30|unique:users',
+            'nome' => 'required|string|max:100',
+            'telefone' => 'required|string|max:15',
+            'email' => 'required|email|max:100|unique:users',
+            'password' => 'required|string|min:6',
         ];
     }
 
@@ -73,12 +75,20 @@ class UserRequest extends FormRequest
     public function messages():array
     {
         return[
+            'username.required' => 'Campo username é obrigatório!',
+            'username.unique' => 'Este username já está em uso!',
+            'username.max' => 'Username não pode exceder 30 caracteres!',
             'nome.required' => 'Campo nome é obrigatório!',
+            'nome.max' => 'Nome não pode exceder 100 caracteres!',
+            'telefone.required' => 'Campo telefone é obrigatório!',
+            'telefone.max' => 'Telefone não pode exceder 15 caracteres!',
             'email.required' => 'Campo e-mail é obrigatório!',
             'email.email' => 'Necessario enviar e-mail válido!',
             'email.unique' => 'O e-mail já está cadastrado!',
+            'email.max' => 'E-mail não pode exceder 100 caracteres!',
             'password.required' => 'Campo senha é obrigatório!',
             'password.min' => 'Senha com no mínimo :min caracteres!',
+            'password.string' => 'A senha deve ser uma string!',
         ];
     }
 }

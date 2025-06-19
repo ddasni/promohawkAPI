@@ -114,39 +114,54 @@ class UserController extends Controller
      * @param  \App\Models\User  $id O usuário a ser atualizado.
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UserRequest $request, User $id) : JsonResponse
+    public function update(UserRequest $request, User $id): JsonResponse
     {
-        // iniciar a transação
         DB::beginTransaction();
 
-        try {         
-            $id->update([
-                'username' => $request->username,
-                'nome' => $request->nome,
-                'telefone' => $request->telefone,
-                'email' => $request->email,
-                'password' => $request->password
-            ]);
+        try {
+            // Filtra apenas os campos presentes e não vazios na requisição
+            $updateData = array_filter($request->only([
+                'username',
+                'nome',
+                'telefone',
+                'email',
+                'password'
+            ]), function ($value) {
+                return $value !== null && $value !== '';
+            });
 
-            // operação é concluída com êxito
+            // Verifica se há dados para atualizar
+            if (empty($updateData)) {
+                return response()->json([
+                    'status' => true,
+                    'message' => "Nenhum dado válido fornecido para atualização.",
+                    'user' => new UserResource($id)
+                ], 200);
+            }
+
+            // Se existir password, criptografa
+            if (isset($updateData['password'])) {
+                $updateData['password'] = bcrypt($updateData['password']);
+            }
+
+            $id->update($updateData);
+
             DB::commit();
 
             return response()->json([
                 'status' => true,
-                'user' => $id,
-                'message' => "Usuario editado com sucesso!",
-            ],200);
+                'user' => new UserResource($id->fresh()),
+                'message' => "Usuário atualizado com sucesso!",
+            ], 200);
 
-        }catch (Exception $e){
-            // operação não é concluída com êxito
+        } catch (Exception $e) {
             DB::rollBack();
 
-            // retorna uma mensagem de erro com status 400
             return response()->json([
                 'status' => false,
-                'message' => "Usuario não editado",
+                'message' => "Usuário não atualizado",
                 'error' => $e->getMessage(),
-            ],400);
+            ], 400);
         }
     }
 
