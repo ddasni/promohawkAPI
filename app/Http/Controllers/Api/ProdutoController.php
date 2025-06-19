@@ -10,6 +10,7 @@ use App\Models\PrecoProduto;
 use Illuminate\Http\Request;
 use App\Models\ImagemProduto;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\LojaRequest;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -20,6 +21,16 @@ use App\Http\Resources\ProdutoResource;
 
 class ProdutoController extends Controller
 {
+    // Tempo de vida do cache em minutos
+    protected $cacheMinutes = 60;
+    
+    // Chave para cache da lista de produtos
+    protected $cacheIndexKey = 'produtos_index';
+    
+    // Prefixo para cache de produto individual
+    protected $cacheShowPrefix = 'produto_';
+
+
     /**
     * Retorna uma lista de produtos.
     *
@@ -28,14 +39,16 @@ class ProdutoController extends Controller
     *
     * @return \Illuminate\Http\JsonResponse
     */
-   public function index()
+    public function index()
     {
-        $produtos = Produto::with([
-            'precos.loja',
-            'imagens',
-            'reviews.usuario',
-            'categoria',
-        ])->orderBy('id', 'desc')->get();
+        $produtos = Cache::remember($this->cacheIndexKey, $this->cacheMinutes, function () {
+            return Produto::with([
+                'precos.loja',
+                'imagens',
+                'reviews.usuario',
+                'categoria',
+            ])->orderBy('id', 'desc')->get();
+        });
 
         return response()->json([
             'status' => true,
@@ -54,12 +67,16 @@ class ProdutoController extends Controller
     */
     public function show(Produto $id)
     {
-        $produto = Produto::with([
-            'precos.loja',
-            'imagens',
-            'reviews.usuario',
-            'categoria',
-        ])->findOrFail($id->id);
+        $cacheKey = $this->cacheShowPrefix . $id->id;
+        
+        $produto = Cache::remember($cacheKey, $this->cacheMinutes, function () use ($id) {
+            return Produto::with([
+                'precos.loja',
+                'imagens',
+                'reviews.usuario',
+                'categoria',
+            ])->findOrFail($id->id);
+        });
 
         return response()->json([
             'status' => true,
@@ -140,6 +157,9 @@ class ProdutoController extends Controller
 
             DB::commit();
 
+            // Limpa o cache de produtos
+            $this->clearCache();
+
             return response()->json([
                 'status' => true,
                 'message' => $produtoFoiCriado
@@ -196,6 +216,9 @@ class ProdutoController extends Controller
 
             DB::commit();
 
+            // Limpa o cache do produto atualizado e da lista
+            $this->clearCache($id);
+
             return response()->json([
                 'status' => true,
                 'produto' => new ProdutoResource($id->fresh()),
@@ -238,6 +261,23 @@ class ProdutoController extends Controller
                 'message' => "Produto não apagado",
                 'error' => $e->getMessage(),
             ],400);
+        }
+    }
+
+
+    /**
+     * Limpa o cache relacionado aos produtos
+     * 
+     * @param Produto|null $produto Produto específico para limpar (opcional)
+     */
+    protected function clearCache(Produto $produto = null)
+    {
+        // Limpa a lista de produtos
+        Cache::forget($this->cacheIndexKey);
+        
+        // Limpa o cache do produto específico se fornecido
+        if ($produto) {
+            Cache::forget($this->cacheShowPrefix . $produto->id);
         }
     }
 }
