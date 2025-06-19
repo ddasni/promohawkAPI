@@ -39,7 +39,7 @@ class AdmRequest extends FormRequest
         if ($isUpdate) {
             return [
                 'nome' => 'sometimes|string|max:255',
-                'email' => 'sometimes|email|unique:adms,email,' . ($admID ? $admID->id : 'null'),
+                'email' => 'sometimes|email|unique:adm,email,' . ($admID ? $admID->id : 'null'),
                 'password' => 'sometimes|min:6',
             ];
         }
@@ -47,7 +47,7 @@ class AdmRequest extends FormRequest
 
         return [
             'nome' => 'required|string|max:255',
-            'email' => 'required|email|unique:adms,email',
+            'email' => 'required|email|unique:adm,email',
             'password' => 'required|min:6',
         ];    
     }

@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AdmController;
+use App\Http\Controllers\Api\AuthAdmController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LojaController;
 use App\Http\Controllers\Api\UserController;
@@ -34,13 +35,25 @@ Route::prefix('auth')->group(function () {
 });
 
 
-// Rotas para gerenciamento de adm
-Route::controller(AdmController::class)->group(function () {
-    Route::get('/adm', 'index');           // GET     /adm
-    Route::get('/adm/{id}', 'show');       // GET     /adm/{id}
-    Route::post('/adm', 'store');          // POST    /adm
-    Route::put('/adm/{id}', 'update');     // PUT     /adm/{id}
-    Route::delete('/adm/{id}', 'destroy'); // DELETE  /adm/{id}
+// Rotas para administradores
+Route::prefix('adm')->group(function () {
+    // Login
+    Route::post('/login', [AuthAdmController::class, 'login']);
+    
+    // Rotas protegidas
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [AuthAdmController::class, 'logout']); // Logout
+        Route::get('/me', [AuthAdmController::class, 'me']); // exibir dados do adm logado
+    });
+
+    // Rotas para gerenciamento de adm
+    Route::controller(AdmController::class)->group(function () {
+        Route::get('/', 'index');           // GET     /adm
+        Route::get('/{id}', 'show');       // GET     /adm/{id}
+        Route::post('/', 'store');          // POST    /adm
+        Route::put('/{id}', 'update');     // PUT     /adm/{id}
+        Route::delete('/{id}', 'destroy'); // DELETE  /adm/{id}
+    });
 });
 
 
