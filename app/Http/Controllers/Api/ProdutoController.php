@@ -64,7 +64,7 @@ class ProdutoController extends Controller
         return response()->json([
             'status' => true,
             'produto' => new ProdutoResource($produto),
-        ]);
+        ], 200);
     }
 
 
