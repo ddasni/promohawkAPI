@@ -10,9 +10,14 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class LojaController extends Controller
 {
+    protected $cacheMinutes = 60;
+    protected $cacheIndexKey = 'lojas_index';
+    protected $cacheShowPrefix = 'loja_';
+
     /**
     * Retorna uma lista de lojas.
     *
@@ -24,7 +29,9 @@ class LojaController extends Controller
     public function index()
     {
         // Recupera os lojas do banco de dados, ordenados por id em ordem decrescente
-        $lojas = Loja::with(['produtos', 'cupons'])->orderBy('id', 'DESC')->get();
+        $lojas = Cache::remember($this->cacheIndexKey, $this->cacheMinutes, function () {
+            return Loja::with(['produtos', 'cupons'])->orderBy('id', 'DESC')->get();
+        });
 
         // Retorna os lojas recuperados com uma resposta JSON
         return response()->json([
@@ -45,7 +52,11 @@ class LojaController extends Controller
     */
     public function show(Loja $id)
     {
-        $id->load(['produtos', 'cupons']);
+        $cacheKey = $this->cacheShowPrefix . $id->id;
+        
+        $loja = Cache::remember($cacheKey, $this->cacheMinutes, function () use ($id) {
+            return Loja::with(['produtos', 'cupons'])->findOrFail($id->id);
+        });
 
         return response()->json([
             'status' => true,
@@ -74,6 +85,8 @@ class LojaController extends Controller
 
             // operação é concluída com êxito
             DB::commit();
+
+            $this->clearCache();
 
             return response()->json([
                 'status' => true,
@@ -114,6 +127,8 @@ class LojaController extends Controller
             // operação é concluída com êxito
             DB::commit();
 
+            $this->clearCache($id);
+
             return response()->json([
                 'status' => true,
                 'loja' => new LojaResource($id),
@@ -144,6 +159,8 @@ class LojaController extends Controller
 
             $id->delete();
 
+            $this->clearCache($id);
+
             return response()->json([
                 'status' => true,
                 'Loja' => $id,
@@ -158,6 +175,16 @@ class LojaController extends Controller
                 'message' => "Loja não apagado",
                 'error' => $e->getMessage(),
             ],400);
+        }
+    }
+
+    
+    protected function clearCache(Loja $loja = null)
+    {
+        Cache::forget($this->cacheIndexKey);
+        
+        if ($loja) {
+            Cache::forget($this->cacheShowPrefix . $loja->id);
         }
     }
 }
