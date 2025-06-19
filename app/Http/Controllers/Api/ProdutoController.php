@@ -32,6 +32,53 @@ class ProdutoController extends Controller
 
 
     /**
+    * Realiza busca de produtos em tempo real conforme o usuário digita.
+    * Retorna apenas nome e imagem principal do produto para exibição durante a pesquisa.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\JsonResponse
+    */
+    public function search(Request $request)
+    {
+        $searchTerm = trim($request->input('query', ''));
+        
+        // Se o termo de busca estiver vazio ou muito curto, retorna vazio
+        if (strlen($searchTerm) < 2) {
+            return response()->json([
+                'status' => true,
+                'produtos' => [],
+            ], 200);
+        }
+        
+        // Cria uma chave de cache única para o termo de busca
+        $cacheKey = 'product_search_' . md5($searchTerm);
+        
+        $produtos = Cache::remember($cacheKey, $this->cacheMinutes, function () use ($searchTerm) {
+            return Produto::with(['imagens'])
+                ->where('nome', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('descricao', 'LIKE', "%{$searchTerm}%")
+                ->orderBy('nome')
+                ->limit(10) // Limita a 10 resultados para performance
+                ->get(['id', 'nome']); // Seleciona apenas os campos necessários
+        });
+        
+        // Formata a resposta com apenas os dados necessários para exibição
+        $resultados = $produtos->map(function($produto) {
+            return [
+                'id' => $produto->id,
+                'nome' => $produto->nome,
+                'imagem' => $produto->imagens->first()->imagem ?? null // Pega a primeira imagem ou null
+            ];
+        });
+        
+        return response()->json([
+            'status' => true,
+            'produtos' => $resultados,
+        ], 200);
+    }
+
+
+    /**
     * Retorna uma lista de produtos.
     *
     * Este método recupera uma lista de produtos do banco de dados

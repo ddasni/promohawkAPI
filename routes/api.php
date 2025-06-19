@@ -109,6 +109,7 @@ Route::controller(CupomController::class)->group(function () {
 
 // Rotas para gerenciamento de Produtos
 Route::controller(ProdutoController::class)->group(function () {
+    Route::get('/produto/search', 'search');   // GET /produto/search?query=termo
     Route::get('/produto', 'index');           // GET     /produto
     Route::get('/produto/{id}', 'show');       // GET     /produto/{id}
     Route::post('/produto', 'store');          // POST    /produto
