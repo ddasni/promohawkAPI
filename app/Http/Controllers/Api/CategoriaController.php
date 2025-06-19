@@ -25,8 +25,8 @@ class CategoriaController extends Controller
 
     public function show(Categoria $id): JsonResponse
     {
-        // Carrega os produtos da categoria específica
-        $id->load('produtos');
+        // pegando os produtos com preços da categoria específica
+        $id->load('produtos.precos');
 
         return response()->json([
             'status' => true,
