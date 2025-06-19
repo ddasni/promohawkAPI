@@ -168,31 +168,48 @@ class ProdutoController extends Controller
      */
     public function update(ProdutoRequest $request, Produto $id) : JsonResponse
     {
-        // iniciar a transação
         DB::beginTransaction();
 
-        try {         
-            $id->update($request->validated());
+        try {
+            // Atualiza os campos básicos do produto se estiverem presentes na requisição
+            $id->update($request->only([
+                'nome', 
+                'descricao', 
+                'link', 
+                'status_produto',
+                'categoria_id'
+            ]));
 
-            // operação é concluída com êxito
+            // Atualizar imagens se estiverem presentes na requisição
+            if ($request->has('imagens')) {
+                // Primeiro, deletar todas as imagens existentes
+                $id->imagens()->delete();
+                
+                // Depois, adicionar as novas imagens
+                foreach ($request->imagens as $img) {
+                    ImagemProduto::create([
+                        'produto_id' => $id->id,
+                        'imagem' => $img
+                    ]);
+                }
+            }
+
             DB::commit();
 
             return response()->json([
                 'status' => true,
-                'produto' => $id,
+                'produto' => new ProdutoResource($id->fresh()),
                 'message' => "Produto editado com sucesso!",
-            ],200);
+            ], 200);
 
-        }catch (Exception $e){
-            // operação não é concluída com êxito
+        } catch (Exception $e) {
             DB::rollBack();
 
-            // retorna uma mensagem de erro com status 400
             return response()->json([
                 'status' => false,
                 'message' => "Produto não editado",
                 'error' => $e->getMessage(),
-            ],400);
+            ], 400);
         }
     }
 
