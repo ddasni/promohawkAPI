@@ -41,41 +41,37 @@ class ProdutoController extends Controller
     public function search(Request $request)
     {
         $searchTerm = trim($request->input('query', ''));
-        
-        // Se o termo de busca estiver vazio ou muito curto, retorna vazio
+
         if (strlen($searchTerm) < 2) {
             return response()->json([
                 'status' => true,
                 'produtos' => [],
-            ], 200);
+            ]);
         }
-        
-        // Cria uma chave de cache única para o termo de busca
-        $cacheKey = 'product_search_' . md5($searchTerm);
-        
-        $produtos = Cache::remember($cacheKey, $this->cacheMinutes, function () use ($searchTerm) {
-            return Produto::with(['imagens'])
-                ->where('nome', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('descricao', 'LIKE', "%{$searchTerm}%")
-                ->orderBy('nome')
-                ->limit(10) // Limita a 10 resultados para performance
-                ->get(['id', 'nome']); // Seleciona apenas os campos necessários
-        });
-        
-        // Formata a resposta com apenas os dados necessários para exibição
-        $resultados = $produtos->map(function($produto) {
+
+        $produtos = Produto::select('id', 'nome')
+            ->with(['imagens', 'precos', 'reviews'])
+            ->withAvg('reviews as media_nota', 'avaliacao_produto')
+            ->whereRaw("MATCH(nome) AGAINST(? IN NATURAL LANGUAGE MODE)", [$searchTerm])
+            ->limit(10)
+            ->get();
+
+        $resultados = $produtos->map(function ($produto) {
             return [
                 'id' => $produto->id,
                 'nome' => $produto->nome,
-                'imagem' => $produto->imagens->first()->imagem ?? null // Pega a primeira imagem ou null
+                'imagem' => $produto->imagens->first()->imagem ?? null,
+                'media_nota' => $produto->media_nota ? number_format($produto->media_nota, 1) : null,
+                'preco' => $produto->precos->first()->preco ?? null,
             ];
         });
-        
+
         return response()->json([
             'status' => true,
             'produtos' => $resultados,
-        ], 200);
+        ]);
     }
+
 
 
     /**
