@@ -175,6 +175,12 @@ class ProdutoController extends Controller
                 ]);
 
                 $produtoFoiCriado = true;
+            } 
+            else {
+                // Se o produto já existe, atualiza o link quando vem um novo preço
+                $produto->update([
+                    'link' => $request->link
+                ]);
             }
 
             // Salvar imagens adicionais apenas se o produto for novo
