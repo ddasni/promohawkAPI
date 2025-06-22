@@ -100,6 +100,7 @@ class ProdutoController extends Controller
     }
 
 
+
     /**
     * Exibe os detalhes de um produto específico.
     *
@@ -128,10 +129,11 @@ class ProdutoController extends Controller
     }
 
 
+
     /**
     * Cria um novo produto com os dados fornecidos na requisição.
     * 
-    * @param  \App\Http\Requests\ProdutoRequest  $request O objeto de requisição contendo os dados do usuário a ser criado.
+    * @param  \App\Http\Requests\ProdutoRequest  $request O objeto de requisição contendo os dados do produto a ser criado.
     * @return \Illuminate\Http\JsonResponse
     */
     public function store(ProdutoRequest $request)
@@ -139,9 +141,6 @@ class ProdutoController extends Controller
         // Validando as partes de loja e categoria
         app(LojaRequest::class)->validateResolved();
         app(CategoriaRequest::class)->validateResolved();
-
-        // aumentando temporariamente o limite de memória
-        ini_set('memory_limit', '1024M');
 
         DB::beginTransaction();
 
@@ -230,6 +229,118 @@ class ProdutoController extends Controller
             ], 400);
         }
     }
+
+
+
+    /**
+    * Cria vários produtos com os dados fornecidos na requisição.
+    * 
+    * @param  \App\Http\Requests\ProdutoRequest  $request O objeto de requisição contendo os dados dos produtos a serem criados.
+    * @return \Illuminate\Http\JsonResponse
+    */
+    public function storeProdutos(ProdutoRequest $request)
+    {
+        $produtos = $request->input('produtos');
+
+        // Validação extra de segurança
+        if (!is_array($produtos)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'A requisição deve conter um array de produtos.',
+            ], 422);
+        }
+
+        ini_set('memory_limit', '1024M');
+        DB::beginTransaction();
+
+        try {
+            $resultados = [];
+
+            foreach ($produtos as $item) {
+                // Cria ou busca loja
+                $loja = Loja::firstOrCreate(
+                    ['nome' => $item['loja_nome']],
+                    ['imagem' => $item['loja_imagem'] ?? null]
+                );
+
+                // Cria ou busca categoria
+                $categoria = Categoria::firstOrCreate(
+                    ['nome' => $item['categoria_nome']],
+                    ['imagem' => $item['categoria_imagem'] ?? null]
+                );
+
+                // Verifica se produto já existe
+                $produto = Produto::where('nome', $item['nome'])->first();
+                $produtoFoiCriado = false;
+
+                if (!$produto) {
+                    $produto = Produto::create([
+                        'nome' => $item['nome'],
+                        'descricao' => $item['descricao'] ?? null,
+                        'categoria_id' => $categoria->id,
+                        'link' => $item['link'] ?? null,
+                        'status_produto' => $item['status_produto'] ?? 'ativo'
+                    ]);
+
+                    $produtoFoiCriado = true;
+                } else {
+                    // Atualiza o link se já existe
+                    $produto->update([
+                        'link' => $item['link'] ?? $produto->link
+                    ]);
+                }
+
+                // Salva imagens apenas se o produto for novo
+                if ($produtoFoiCriado && isset($item['imagens']) && is_array($item['imagens'])) {
+                    foreach ($item['imagens'] as $img) {
+                        ImagemProduto::create([
+                            'produto_id' => $produto->id,
+                            'imagem' => $img
+                        ]);
+                    }
+                }
+
+                // Cadastra o preço
+                $preco = PrecoProduto::create([
+                    'produto_id' => $produto->id,
+                    'loja_id' => $loja->id,
+                    'preco' => $item['preco'],
+                    'forma_pagamento' => $item['forma_pagamento'] ?? null,
+                    'parcelas' => $item['parcelas'] ?? null,
+                    'valor_parcela' => $item['valor_parcela'] ?? null,
+                ]);
+
+                $resultados[] = [
+                    'produto' => $produto,
+                    'loja' => $loja,
+                    'categoria' => $categoria,
+                    'preco' => $preco,
+                    'mensagem' => $produtoFoiCriado
+                        ? 'Produto criado com sucesso!'
+                        : 'Produto já existia, preço registrado.'
+                ];
+            }
+
+            DB::commit();
+            $this->clearCache();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Cadastro de múltiplos produtos realizado com sucesso.',
+                'resultados' => $resultados
+            ], 201);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Erro ao cadastrar os produtos.',
+                'error' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
 
 
     /**

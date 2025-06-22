@@ -113,6 +113,7 @@ Route::controller(ProdutoController::class)->group(function () {
     Route::get('/produto', 'index');           // GET     /produto
     Route::get('/produto/{id}', 'show');       // GET     /produto/{id}
     Route::post('/produto', 'store');          // POST    /produto
+    Route::post('/produtos', 'storeProdutos'); // POST    /produtos
     Route::put('/produto/{id}', 'update');     // PUT     /produto/{id}
     Route::delete('/produto/{id}', 'destroy'); // DELETE  /produto/{id}
 });
