@@ -113,38 +113,32 @@ class LojaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(LojaRequest $request, Loja $id) : JsonResponse
+    public function update(LojaRequest $request, Loja $id): JsonResponse
     {
-        // iniciar a transação
         DB::beginTransaction();
 
-        try {         
-            $id->update([
-                'nome' => $request->nome,
-                'imagem' => $request->imagem
-            ]);
+        try {
+            $dados = $request->only(['nome', 'imagem']);
 
-            // operação é concluída com êxito
+            $id->update($dados);
+
             DB::commit();
-
             $this->clearCache($id);
 
             return response()->json([
                 'status' => true,
-                'loja' => new LojaResource($id),
-                'message' => "Loja editado com sucesso!",
-            ],200);
+                'loja' => new LojaResource($id->fresh()),
+                'message' => "Loja editada com sucesso!",
+            ], 200);
 
-        }catch (Exception $e){
-            // operação não é concluída com êxito
+        } catch (Exception $e) {
             DB::rollBack();
 
-            // retorna uma mensagem de erro com status 400
             return response()->json([
                 'status' => false,
-                'message' => "Loja não editado",
+                'message' => "Loja não foi editada.",
                 'error' => $e->getMessage(),
-            ],400);
+            ], 400);
         }
     }
 
@@ -178,6 +172,7 @@ class LojaController extends Controller
         }
     }
 
+    
     
     protected function clearCache(Loja $loja = null)
     {
