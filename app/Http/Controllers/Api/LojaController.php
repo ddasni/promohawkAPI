@@ -60,7 +60,7 @@ class LojaController extends Controller
 
         return response()->json([
             'status' => true,
-            'loja' => new LojaResource($id),
+            'loja' => new LojaResource($loja),
         ],200);
     }
 
