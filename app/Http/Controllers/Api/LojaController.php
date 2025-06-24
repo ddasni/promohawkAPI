@@ -30,7 +30,13 @@ class LojaController extends Controller
     {
         // Recupera os lojas do banco de dados, ordenados por id em ordem decrescente
         $lojas = Cache::remember($this->cacheIndexKey, $this->cacheMinutes, function () {
-            return Loja::with(['produtos', 'cupons'])->orderBy('id', 'DESC')->get();
+            return Loja::with([
+                'produtos.categoria',
+                'produtos.precos',
+                'produtos.reviews',
+                'produtos.imagens', 
+                'cupons'
+            ])->orderBy('id', 'DESC')->get();
         });
 
         // Retorna os lojas recuperados com uma resposta JSON
@@ -55,7 +61,13 @@ class LojaController extends Controller
         $cacheKey = $this->cacheShowPrefix . $id->id;
         
         $loja = Cache::remember($cacheKey, $this->cacheMinutes, function () use ($id) {
-            return Loja::with(['produtos', 'cupons'])->findOrFail($id->id);
+            return Loja::with([
+                'produtos.categoria',
+                'produtos.precos',
+                'produtos.reviews',
+                'produtos.imagens', 
+                'cupons'
+            ])->findOrFail($id->id);
         });
 
         return response()->json([
