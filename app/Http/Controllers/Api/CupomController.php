@@ -60,7 +60,7 @@ class CupomController extends Controller
     * @param  \App\Http\Requests\CupomRequest  $request O objeto de requisição contendo os dados do usuário a ser criado.
     * @return \Illuminate\Http\JsonResponse
     */
-    public function store(Request $request)
+    public function store(CupomRequest $request)
     {
          // iniciar a transação
         DB::beginTransaction();
@@ -109,6 +109,76 @@ class CupomController extends Controller
                 'message' => "Produto não cadastrado",
                 'error' => $e->getMessage(),
             ],400);
+        }
+    }
+
+
+
+    /**
+     * Cadastra múltiplos cupons de uma vez.
+     *
+     * Espera um array de cupons com dados como: código, desconto, validade e loja.
+     *
+     * @param  \App\Http\Requests\CupomRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function storeCupons(CupomRequest $request): JsonResponse
+    {
+        $cupons = $request->input('cupons');
+
+        // Validação extra de segurança
+        if (!is_array($cupons) || count($cupons) === 0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'A requisição deve conter um array de cupons.',
+            ], 422);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $cuponsCadastrados = [];
+
+            foreach ($cupons as $item) {
+                // Cria ou busca a loja pelo nome
+                $loja = Loja::firstOrCreate(
+                    ['nome' => $item['loja']['nome']],
+                    ['imagem' => $item['loja']['imagem'] ?? null]
+                );
+
+                // Cria o cupom com vínculo à loja
+                $cupom = Cupom::create([
+                    'codigo' => $item['codigo'],
+                    'descricao' => $item['descricao'],
+                    'desconto' => $item['desconto'],
+                    'validade' => $item['validade'],
+                    'status_cupom' => $item['status_cupom'] ?? 'ativo',
+                    'loja_id' => $loja->id,
+                ]);
+
+                $cuponsCadastrados[] = [
+                    'cupom' => $cupom,
+                    'loja' => $loja,
+                    'mensagem' => 'Cupom cadastrado com sucesso!'
+                ];
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Cadastro de múltiplos cupons realizado com sucesso.',
+                'resultados' => $cuponsCadastrados
+            ], 201);
+
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Erro ao cadastrar os cupons.',
+                'error' => $e->getMessage(),
+            ], 400);
         }
     }
 

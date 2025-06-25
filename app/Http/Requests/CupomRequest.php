@@ -32,27 +32,54 @@ class CupomRequest extends FormRequest
      */
     public function rules(): array
     {
-        $cupomID = $this->route('id');
-        $cupomUpdate = $this->isMethod('put') || $this->isMethod('patch');
+        $isLote = $this->has('cupons') && is_array($this->input('cupons'));
 
-        if ($cupomUpdate) {
+        if ($this->isMethod('put') || $this->isMethod('patch')) {
+            if ($isLote) {
+                return [
+                    'cupons' => 'required|array|min:1',
+                    'cupons.*.codigo' => 'sometimes|string|max:50',
+                    'cupons.*.descricao' => 'sometimes|string|max:100',
+                    'cupons.*.desconto' => 'sometimes|numeric|min:0',
+                    'cupons.*.validade' => 'sometimes|date|after_or_equal:today',
+                    'cupons.*.status_cupom' => 'sometimes|string|max:15',
+                    'cupons.*.loja.nome' => 'required|string|max:100',
+                    'cupons.*.loja.imagem' => 'nullable|string',
+                ];
+            } else {
+                return [
+                    'codigo' => 'sometimes|string|max:50',
+                    'descricao' => 'sometimes|string|max:100',
+                    'desconto' => 'sometimes|numeric|min:0',
+                    'validade' => 'sometimes|date|after_or_equal:today',
+                    'status_cupom' => 'sometimes|string|max:15',
+                    'loja.nome' => 'required|string|max:100',
+                    'loja.imagem' => 'nullable|string',
+                ];
+            }
+        }
+
+        if ($isLote) {
             return [
-                'loja_id'       => 'sometimes|exists:loja,id',
-                'codigo'        => 'sometimes|string|max:50',
-                'descricao'     => 'sometimes|string|max:100',
-                'desconto'      => 'sometimes|numeric|min:0',
-                'validade'      => 'sometimes|date|after_or_equal:today',
-                'status_cupom'  => 'sometimes|string|max:15',
+                'cupons' => 'required|array|min:1',
+                'cupons.*.codigo' => 'required|string|max:50',
+                'cupons.*.descricao' => 'required|string|max:100',
+                'cupons.*.desconto' => 'required|numeric|min:0',
+                'cupons.*.validade' => 'required|date|after_or_equal:today',
+                'cupons.*.status_cupom' => 'sometimes|string|max:15',
+                'cupons.*.loja.nome' => 'required|string|max:100',
+                'cupons.*.loja.imagem' => 'nullable|string',
             ];
         }
 
         return [
-            'loja_id'       => 'required|exists:loja,id',
-            'codigo'        => 'required|string|max:50',
-            'descricao'     => 'required|string|max:100',
-            'desconto'      => 'required|numeric|min:0',
-            'validade'      => 'required|datetime|after_or_equal:today',
-            'status_cupom'  => 'sometimes|string|max:15',
+            'codigo' => 'required|string|max:50',
+            'descricao' => 'required|string|max:100',
+            'desconto' => 'required|numeric|min:0',
+            'validade' => 'required|date|after_or_equal:today',
+            'status_cupom' => 'sometimes|string|max:15',
+            'loja.nome' => 'required|string|max:100',
+            'loja.imagem' => 'nullable|string',
         ];
     }
 
@@ -62,24 +89,25 @@ class CupomRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'loja_id.required'         => 'O campo loja_id é obrigatório.',
-            'loja_id.exists'           => 'Loja não encontrada.',
+            // Mensagens para cupons em lote
+            'cupons.required' => 'É necessário enviar ao menos um cupom.',
+            'cupons.*.codigo.required' => 'O código é obrigatório para cada cupom.',
+            'cupons.*.descricao.required' => 'A descrição é obrigatória para cada cupom.',
+            'cupons.*.desconto.required' => 'O desconto é obrigatório para cada cupom.',
+            'cupons.*.validade.required' => 'A validade é obrigatória para cada cupom.',
+            'cupons.*.loja.nome.required' => 'O nome da loja é obrigatório para cada cupom.',
 
-            'codigo.required'          => 'O código do cupom é obrigatório.',
-            'codigo.string'            => 'O código deve ser uma string.',
-            'codigo.max'               => 'O código pode ter no máximo :max caracteres.',
-
-            'descricao.required'       => 'A descrição é obrigatŕia.',
-            'descricao.string'         => 'A descrição deve ser uma string.',
-            'descricao.max'            => 'A descrição deve ter no máximo :max caracteres.',
-
-            'desconto.required'        => 'O desconto é obrigatório.',
-            'desconto.numeric'         => 'O desconto deve ser um número.',
-            'desconto.min'             => 'O desconto não pode ser negativo.',
-
-            'validade.required'        => 'A validade do cupom é obrigatória.',
-            'validade.date'            => 'Data de validade inválida.',
-            'validade.after_or_equal'  => 'A validade deve ser hoje ou uma data futura.',
+            // Mensagens para cupom único
+            'codigo.required' => 'O código do cupom é obrigatório.',
+            'codigo.max' => 'O código pode ter no máximo :max caracteres.',
+            'descricao.required' => 'A descrição é obrigatória.',
+            'descricao.max' => 'A descrição pode ter no máximo :max caracteres.',
+            'desconto.required' => 'O desconto é obrigatório.',
+            'desconto.numeric' => 'O desconto deve ser numérico.',
+            'validade.required' => 'A validade do cupom é obrigatória.',
+            'validade.date' => 'A validade deve ser uma data válida.',
+            'validade.after_or_equal' => 'A validade deve ser hoje ou uma data futura.',
+            'loja.nome.required' => 'O nome da loja é obrigatório.',
         ];
     }
 }

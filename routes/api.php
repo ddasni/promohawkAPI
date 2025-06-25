@@ -102,6 +102,7 @@ Route::controller(CupomController::class)->group(function () {
     Route::get('/cupom', 'index');           // GET     /cupom
     Route::get('/cupom/{id}', 'show');       // GET     /cupom/{id}
     Route::post('/cupom', 'store');          // POST    /cupom
+    Route::post('/cupons', 'storeCupons');   // POST    /cupons
     Route::put('/cupom/{id}', 'update');     // PUT     /cupom/{id}
     Route::delete('/cupom/{id}', 'destroy'); // DELETE  /cupom/{id}
 });
