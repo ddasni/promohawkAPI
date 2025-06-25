@@ -90,7 +90,7 @@ class ProdutoController extends Controller
                 'imagens',
                 'reviews.usuario',
                 'categoria',
-            ])->orderBy('id', 'desc')->get();
+            ])->inRandomOrder()->get();
         });
 
         return response()->json([
