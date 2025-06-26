@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Mail\ResetPasswordSuccessMail;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Resources\LoginResource;
 
 
 class AuthController extends Controller
@@ -94,7 +95,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'status' => true,
-            'user' => $request->user(),
+            'user' => new LoginResource($request->user()),
         ], 200);
     }
 
